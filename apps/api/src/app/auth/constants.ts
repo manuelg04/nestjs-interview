@@ -1,4 +1,3 @@
-
 export const jwtConstants = {
-  secret: process.env.SECRET_KEY || 'fallback-secret',
+  secret: process.env.JWT_SECRET || 'fallback-secret',
 };

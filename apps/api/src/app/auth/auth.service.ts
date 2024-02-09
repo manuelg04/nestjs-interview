@@ -1,52 +1,57 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { UserRepository } from '../repositories/user.repository';
-import { JwtService } from '@nestjs/jwt';
+import { LoginDto } from './dto/login-employee.dto';
+import { JwtService } from "@nestjs/jwt";
+import { PrismaService } from "../../prisma.service";
+import { EmployeesService } from "../employees/employees.service";
+import { Injectable, NotFoundException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import { Employee } from '../entities/user.entity';
-import { CreateUserDto } from './dto/create-user.dto';
+import { RegisterEmployeeDto } from './dto/register-employee.dto';
+import { Employees } from '../employees/employee.model';
 
 @Injectable()
 export class AuthService {
-  constructor(private userRepository: UserRepository, private jwtService: JwtService) {
 
-  }
+  constructor(
+    private readonly prismaService: PrismaService,
+    private jwtService: JwtService,
+    private readonly employeeService: EmployeesService
+    ) {}
 
-  async validateEmployee(email: string, pass: string): Promise<Employee | null> {
-    const employee = await this.userRepository.findEmployeeByEmail(email);
-    if (employee && await bcrypt.compare(pass, employee.password)) {
-      // La contraseña se verifica pero no se retorna en el objeto
-      return employee;
+    async login(loginDto: LoginDto) {
+      const { email, password } = loginDto;
+      const employee = await this.prismaService.employee.findUnique({
+        where: {
+          email
+        },
+      });
+      if (!employee) {
+        throw new NotFoundException('Employee not found');
+      }
+
+      const validatePassword = bcrypt.compare(password, employee.password);
+
+      if (!validatePassword) {
+        throw new NotFoundException('Invalid credentials');
+      }
+
+      return {
+        token: this.jwtService.sign({ email: employee.email, id: employee.id }),
+      };
+
     }
-    return null;
-  }
 
-  async login(employee: Employee): Promise<{ access_token: string }> {
-    const payload = { email: employee.email, sub: employee.id };
-    return {
-      access_token: this.jwtService.sign(payload),
-    };
-  }
+    async register(createDto: RegisterEmployeeDto){
+      const createEmployees = new Employees();
+      createEmployees.email = createDto.email;
+      createEmployees.password = await  bcrypt.hash(createDto.password, 10);
+      createEmployees.name = createDto.name;
+      createEmployees.payRate = createDto.payRate;
+      createEmployees.payType = createDto.payType;
 
-  async register(createUserDto: CreateUserDto): Promise<Employee> {
-    // Verificar si el usuario ya existe
-    const userExists = await this.userRepository.findEmployeeByEmail(createUserDto.email);
-    if (userExists) {
-      throw new HttpException('El usuario ya existe', HttpStatus.BAD_REQUEST);
+
+      const employee = await this.employeeService.createEmployee(createEmployees);
+
+      return {
+        token: this.jwtService.sign({ email: employee.email, id: employee.id }),
+      };
     }
-
-    // Hashear la contraseña antes de guardarla en la base de datos
-    const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
-
-    // Crear el nuevo usuario con la contraseña hasheada
-    const employee = await this.userRepository.createEmployee({
-      ...createUserDto,
-      password: hashedPassword,
-    });
-
-    // No incluir la contraseña en el objeto de retorno
-    delete employee.password;
-
-    return employee;
-  }
 }

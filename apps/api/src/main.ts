@@ -9,6 +9,11 @@ async function bootstrap() {
   const document = createSwaggerDocument(app);
 
   SwaggerModule.setup(`${globalPrefix}/docs`, app, document);
+  const cors ={
+    origin: ['http://localhost:3000'],
+    methods: 'GET, HEAD,PUT,PATCH,POST,DELETE,OPTIONS'
+  }
+  app.enableCors(cors);
 
   const port = process.env.PORT || 3000;
   await app.listen(port);

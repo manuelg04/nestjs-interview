@@ -9,3 +9,23 @@ datasource db {
   provider = "mysql"
   url      = env("DB_URL")
 }
+
+model Employee {
+  id         Int      @id @default(autoincrement())
+  name       String
+  payType    String
+  payRate    Float
+  timesheets Timesheet[]
+}
+
+model Timesheet {
+  id           Int      @id @default(autoincrement())
+  employeeId   Int
+  date         DateTime
+  hoursWorked  Int?
+  grossWage    Float
+  checkDate    DateTime
+  employee     Employee @relation(fields: [employeeId], references: [id])
+  status       String
+  notes        String?
+}

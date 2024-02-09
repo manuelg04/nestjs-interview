@@ -7,12 +7,15 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
-  url      = env("DB_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
+
 
 model Employee {
   id         Int      @id @default(autoincrement())
+  email      String   @unique
+  password   String
   name       String
   payType    String
   payRate    Float

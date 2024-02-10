@@ -22,12 +22,17 @@ export default function Dashboard() {
 
   const handleSaveEmployee = async (employeeData) => {
     try {
-      // Make the API call to save the new employee
-      const response = await axios.post('http://localhost:3000/api/auth/register', {
-        name: employeeData.name,
-        email: employeeData.email,
-        payType: employeeData.payType,
-        payRate: parseFloat(employeeData.payRate),
+
+      const token = localStorage.getItem('token');
+      if (!token) {
+        console.error('Authentication token is not available');
+        return;
+      }
+
+      const response = await axios.post('http://localhost:3000/api/employees', employeeData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
       console.log('Employee saved:', response.data);
       closeEmployeeDialog();

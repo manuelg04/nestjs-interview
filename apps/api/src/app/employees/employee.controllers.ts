@@ -20,7 +20,7 @@ export class EmployeesController {
       throw new HttpException('Failed to get employees', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
-
+  
   @Post()
   @UseGuards(JwtAuthGuard)
   async createEmployee(@Body() createDto: RegisterEmployeeDto): Promise<Employees> {

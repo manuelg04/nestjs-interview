@@ -9,10 +9,9 @@ import {
 import { PrismaService } from '../../prisma.service';
 import { Employees } from './employee.model';
 
-// Puedes ajustar este valor según sea necesario o hacerlo configurable
 const MINIMUM_WAGE = {
-  hourly: 12.0, // salario por hora
-  salary: 480.0, // salario por cheque
+  hourly: 12.0,
+  salary: 480.0,
 };
 
 @Injectable()

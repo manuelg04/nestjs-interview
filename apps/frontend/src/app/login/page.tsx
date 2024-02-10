@@ -22,17 +22,12 @@ export default function LoginPage() {
       return;
     }
 
-    if (password.length < 8 || password.length > 20) {
-      setError('Password must be between 8 and 20 characters long');
-      return;
-    }
-
     try {
       const response = await axios.post('http://localhost:3000/api/auth/login', {
         email,
         password,
       });
-      console.log(response.data);
+      localStorage.setItem('token', response.data.result.token);
       router.push('/dashboard');
     } catch (error) {
       console.error('An error occurred', error);

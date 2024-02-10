@@ -39,7 +39,7 @@ describe('EmployeesService', () => {
       const result = await timesheetService.createTimesheet(CreateTimesheetDto);
       expect(result).toEqual(expect.objectContaining({
         ...CreateTimesheetDto,
-        id: expect.any(Number) // Verifica que se haya generado un ID
+        id: expect.any(Number)
       }));
     });
 

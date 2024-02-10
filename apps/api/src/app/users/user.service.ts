@@ -28,7 +28,6 @@ export class UserService {
     const passwordValid = await bcrypt.compare(loginUserDto.password, user.password);
     if (!passwordValid) throw new Error('Invalid password');
 
-    // Implement JWT token creation and return it
     return { message: 'Login successful', userId: user.id };
   }
 }

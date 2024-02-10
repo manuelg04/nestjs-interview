@@ -37,8 +37,8 @@ describe('EmployeesService', () => {
       const result = await employeesService.createEmployee(employeeDto);
       expect(result).toEqual(expect.objectContaining({
         ...employeeDto,
-        password: expect.any(String), // Verifica solo que password es un string
-        id: expect.any(Number) // Verifica que se haya generado un ID
+        password: expect.any(String),
+        id: expect.any(Number)
       }));
     });
 

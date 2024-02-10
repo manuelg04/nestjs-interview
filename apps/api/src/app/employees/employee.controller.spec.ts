@@ -37,7 +37,7 @@ describe('EmployeesController', () => {
       const result = await controller.createEmployee(employeeDto);
       expect(result).toEqual(expect.objectContaining({
         ...employeeDto,
-        id: expect.any(Number) // Verifica que se haya generado un ID
+        id: expect.any(Number)
       }));
     });
 

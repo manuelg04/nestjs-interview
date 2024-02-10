@@ -18,12 +18,8 @@ export default function RegisterPage() {
     event.preventDefault();
     setErrorMessage('');
 
-    if (password.length < 8 || password.length > 20) {
-      setErrorMessage('Password must be between 8 and 20 characters long');
-      return;
-    }
     try {
-       await axios.post(
+      const response = await axios.post(
         'http://localhost:3000/api/auth/register',
         {
           email,
@@ -31,6 +27,7 @@ export default function RegisterPage() {
 
         },
       );
+      console.log("🚀 ~ response:", response.data)
       setSuccessMessage('Registro exitoso. Redirigiendo al login...');
       setTimeout(() => {
         router.push('/login');

@@ -42,8 +42,9 @@ export class AuthController{
          console.log(err);
          return response.status(500).json({
            status: 'Error!',
-           message: 'Internal Server Error!',
+           message: 'Internal Server Error! ',
          });
+
        }
      }
 

@@ -9,7 +9,7 @@ export class UserController {
 
   @Post('create-admin-user')
   async register(@Body() createUserDto: CreateUserDto) {
-    return this.userService.createAdminUser(createUserDto);
+    return this.userService.createUser(createUserDto);
   }
 
   @Post('login')

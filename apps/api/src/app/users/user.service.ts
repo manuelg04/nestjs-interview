@@ -3,24 +3,25 @@ import { CreateUserDto } from '../auth/dto/create-user-dto';
 import { LoginUserDto } from '../auth/dto/LoginUserDto';
 import { PrismaService } from '../../prisma.service';
 import * as bcrypt from 'bcrypt';
-import { adminUser } from './user.model';
+import { User } from './user.model';
 
 @Injectable()
 export class UserService {
   constructor(private prisma: PrismaService) {}
 
-  async createAdminUser(createUserDto: CreateUserDto): Promise<adminUser> {
+  async createUser(createUserDto: CreateUserDto): Promise<User> {
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
-    return this.prisma.adminUser.create({
+    return this.prisma.user.create({
       data: {
         email: createUserDto.email,
         password: hashedPassword,
+        role: createUserDto.role,
       },
     });
   }
 
   async login(loginUserDto: LoginUserDto) {
-    const user = await this.prisma.adminUser.findUnique({
+    const user = await this.prisma.user.findUnique({
       where: { email: loginUserDto.email },
     });
     if (!user) throw new Error('User not found');

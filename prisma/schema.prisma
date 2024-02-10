@@ -33,14 +33,14 @@ model Timesheet {
   notes        String?
 }
 
-model adminUser {
+model User {
   id       Int      @id @default(autoincrement())
   email    String   @unique
   password String
+  role     UserRole @default(CUSTOMER)
 }
 
-model Customer {
-  id       Int      @id @default(autoincrement())
-  email    String   @unique
-  password String
+enum UserRole {
+  ADMIN
+  CUSTOMER
 }

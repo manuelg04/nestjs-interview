@@ -32,7 +32,7 @@ export class AuthController{
      @Post('/register')
      async register(@Req() request: Request, @Res() response: Response, @Body() createUserDto: CreateUserDto): Promise<any> {
        try {
-         const result = await this.authService.register(createUserDto);
+         const result = await this.authService.createUser(createUserDto);
          return response.status(200).json({
            status: 'Ok!',
            message: 'Successfully registered user!',

@@ -125,7 +125,22 @@ export default function Dashboard() {
                   <TableCell>{employee.payType}</TableCell>
                   <TableCell>${employee.payRate.toFixed(2)}</TableCell>
                   <TableCell className="flex gap-2 min-w-[100px]">
-                    {/* Botones de acción */}
+                    <Button
+                      className="rounded-full w-8 h-8"
+                      size="icon"
+                      variant="ghost"
+                    >
+                      <FileEditIcon className="h-6 w-6" />
+                      <span className="sr-only">Edit</span>
+                    </Button>
+                    <Button
+                      className="rounded-full w-8 h-8"
+                      size="icon"
+                      variant="ghost"
+                    >
+                      <TrashIcon className="h-6 w-6" />
+                      <span className="sr-only">Delete</span>
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))}

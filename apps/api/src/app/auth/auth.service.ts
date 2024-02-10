@@ -5,7 +5,6 @@ import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/co
 import { UserService } from '../users/user.service';
 import { CreateUserDto } from './dto/create-user-dto';
 import { LoginUserDto } from './dto/LoginUserDto';
-import { adminUser } from "../users/user.model";
 import * as bcrypt from 'bcrypt';
 @Injectable()
 export class AuthService {
@@ -18,13 +17,11 @@ export class AuthService {
 
     async login(loginDto: LoginUserDto) {
       const { email, password } = loginDto;
-      const user = await this.prismaService.adminUser.findUnique({
-        where: {
-          email
-        },
+      const user = await this.prismaService.user.findUnique({
+        where: { email },
       });
       if (!user) {
-        throw new NotFoundException('Employee not found');
+        throw new NotFoundException('User not found');
       }
 
       const isPasswordValid = await bcrypt.compare(password, user.password);
@@ -33,20 +30,23 @@ export class AuthService {
       }
 
       return {
-        token: this.jwtService.sign({ email: user.email, id: user.id }),
+        token: this.jwtService.sign({ email: user.email, id: user.id, role: user.role }),
       };
-
     }
 
-    async register(createDto: CreateUserDto){
-      const createAdminUser = new adminUser();
-      createAdminUser.email = createDto.email;
-      createAdminUser.password = createDto.password;
 
-      const employee = await this.userService.createAdminUser(createAdminUser);
+    async createUser(createDto: CreateUserDto) {
+      const hashedPassword = await bcrypt.hash(createDto.password, 10);
+      const user = await this.prismaService.user.create({
+        data: {
+          email: createDto.email,
+          password: hashedPassword,
+          role: createDto.role,
+        },
+      });
 
       return {
-        token: this.jwtService.sign({ email: employee.email, id: employee.id }),
+        token: this.jwtService.sign({ email: user.email, id: user.id, role: user.role }),
       };
     }
 }

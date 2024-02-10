@@ -13,7 +13,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: { sub: string; email: string }) {
-    return this.PrismaService.adminUser.findUnique({
+    return this.PrismaService.user.findUnique({
       where: {
         email: payload.email,
       },

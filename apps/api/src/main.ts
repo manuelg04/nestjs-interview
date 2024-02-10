@@ -10,7 +10,7 @@ async function bootstrap() {
 
   SwaggerModule.setup(`${globalPrefix}/docs`, app, document);
   const cors ={
-    origin: ['http://localhost:3000'],
+    origin: ['http://localhost:3000', 'http://localhost:4200'],
     methods: 'GET, HEAD,PUT,PATCH,POST,DELETE,OPTIONS'
   }
   app.enableCors(cors);

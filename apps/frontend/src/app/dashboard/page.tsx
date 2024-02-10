@@ -11,14 +11,34 @@ import {
 } from '../../ui/components/table';
 import Image from 'next/image';
 import { EmployeeDialog } from '../helpers/createEmployeeModal';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import axios from 'axios';
+import { Employee } from '../entities/employee';
 
 export default function Dashboard() {
   const [isEmployeeDialogOpen, setEmployeeDialogOpen] = useState(false);
+  const [employees, setEmployees] = useState<Employee[]>([]);
 
   const openEmployeeDialog = () => setEmployeeDialogOpen(true);
   const closeEmployeeDialog = () => setEmployeeDialogOpen(false);
+
+  useEffect(() => {
+    const fetchEmployees = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await axios.get('http://localhost:3000/api/employees', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setEmployees(response.data);
+      } catch (error) {
+        console.error('Error fetching employees:', error.response?.data || error.message);
+      }
+    };
+
+    fetchEmployees();
+  }, []);
 
   const handleSaveEmployee = async (employeeData) => {
     try {
@@ -99,51 +119,16 @@ export default function Dashboard() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              <TableRow className="hover:bg-gray-100/50 dark:hover:bg-gray-800/50">
-                <TableCell className="font-semibold">Alice Johnson</TableCell>
-                <TableCell>Hourly</TableCell>
-                <TableCell>$15.00</TableCell>
-                <TableCell className="flex gap-2 min-w-[100px]">
-                  <Button className="h-8 w-8" size="icon">
-                    <FileEditIcon className="w-4 h-4" />
-                    <span className="sr-only">Edit</span>
-                  </Button>
-                  <Button className="h-8 w-8" size="icon">
-                    <TrashIcon className="w-4 h-4" />
-                    <span className="sr-only">Delete</span>
-                  </Button>
-                </TableCell>
-              </TableRow>
-              <TableRow className="hover:bg-gray-100/50 dark:hover:bg-gray-800/50">
-                <TableCell className="font-semibold">Bob Smith</TableCell>
-                <TableCell>Salary</TableCell>
-                <TableCell>$50,000.00</TableCell>
-                <TableCell className="flex gap-2 min-w-[100px]">
-                  <Button className="h-8 w-8" size="icon">
-                    <FileEditIcon className="w-4 h-4" />
-                    <span className="sr-only">Edit</span>
-                  </Button>
-                  <Button className="h-8 w-8" size="icon">
-                    <TrashIcon className="w-4 h-4" />
-                    <span className="sr-only">Delete</span>
-                  </Button>
-                </TableCell>
-              </TableRow>
-              <TableRow className="hover:bg-gray-100/50 dark:hover:bg-gray-800/50">
-                <TableCell className="font-semibold">Eve Williams</TableCell>
-                <TableCell>Hourly</TableCell>
-                <TableCell>$20.00</TableCell>
-                <TableCell className="flex gap-2 min-w-[100px]">
-                  <Button className="h-8 w-8" size="icon">
-                    <FileEditIcon className="w-4 h-4" />
-                    <span className="sr-only">Edit</span>
-                  </Button>
-                  <Button className="h-8 w-8" size="icon">
-                    <TrashIcon className="w-4 h-4" />
-                    <span className="sr-only">Delete</span>
-                  </Button>
-                </TableCell>
-              </TableRow>
+              {employees.map((employee) => (
+                <TableRow key={employee.id} className="hover:bg-gray-100/50 dark:hover:bg-gray-800/50">
+                  <TableCell className="font-semibold">{employee.name}</TableCell>
+                  <TableCell>{employee.payType}</TableCell>
+                  <TableCell>${employee.payRate.toFixed(2)}</TableCell>
+                  <TableCell className="flex gap-2 min-w-[100px]">
+                    {/* Botones de acción */}
+                  </TableCell>
+                </TableRow>
+              ))}
             </TableBody>
           </Table>
         </div>

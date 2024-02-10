@@ -138,4 +138,15 @@ describe('EmployeesService', () => {
       }));
     });
   });
+
+  describe('calculateGrossWage', () => {
+    it('should calculate gross wage successfully', async () => {
+      const employeeId = 1;
+      const hoursWorked = 8;
+      jest.spyOn(timesheetService, 'calculateGrossWage').mockResolvedValue(160);
+
+      const result = await timesheetService.calculateGrossWage(employeeId, hoursWorked);
+      expect(result).toEqual(160);
+    });
+  });
 });

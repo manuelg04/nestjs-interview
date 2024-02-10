@@ -17,7 +17,7 @@ export class TimesheetController {
   constructor(private readonly timesheetService: TimesheetService) {}
 
   @Post()
-  async create(@Body() createTimesheetDto: CreateTimesheetDto) {
+  async createTimesheet(@Body() createTimesheetDto: CreateTimesheetDto) {
     try {
       return this.timesheetService.createTimesheet(createTimesheetDto);
     } catch (err) {
@@ -26,7 +26,7 @@ export class TimesheetController {
   }
 
   @Get()
-  findAll() {
+  findAllTimesheets() {
     try {
       return this.timesheetService.findAllTimesheets();
     } catch (error) {
@@ -35,7 +35,7 @@ export class TimesheetController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOneTimesheet(@Param('id') id: number) {
     try {
       return this.timesheetService.findOneTimesheet(+id);
     } catch (error) {
@@ -44,8 +44,8 @@ export class TimesheetController {
   }
 
   @Patch(':id')
-  update(
-    @Param('id') id: string,
+  updateTimesheet(
+    @Param('id') id: number,
     @Body() updateTimesheetDto: UpdateTimesheetDto,
   ) {
     try {
@@ -56,7 +56,7 @@ export class TimesheetController {
   }
 
   @Delete(':id')
-  delete(@Param('id') id: string) {
+  deleteTimesheet(@Param('id') id: number) {
     try {
       return this.timesheetService.deleteTimesheet(+id);
     } catch (error) {

@@ -92,7 +92,7 @@ export class EmployeesService {
     }
   }
 
-  async deleteEmployee(id: number): Promise<void> {
+  async deleteEmployee(id: number): Promise<{ id: number; }> {
     try {
       const employeeExists = await this.prisma.employee.findUnique({
         where: { id },
@@ -105,6 +105,7 @@ export class EmployeesService {
       await this.prisma.employee.delete({
         where: { id },
       });
+      return employeeExists;
     } catch (error) {
       throw new InternalServerErrorException('Failed to delete employee');
     }

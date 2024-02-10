@@ -6,11 +6,20 @@ import { useRouter } from 'next/navigation';
 import { Input } from '../../ui/components/input';
 import { Button } from '../../ui/components/button';
 import Link from 'next/link';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@ocmi/frontend/ui/components/select';
 
 export default function RegisterPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [role, setRole] = useState('CUSTOMER');
   const [successMessage, setSuccessMessage] = useState('');
   const router = useRouter();
 
@@ -24,10 +33,10 @@ export default function RegisterPage() {
         {
           email,
           password,
-
+          role,
         },
       );
-      console.log("🚀 ~ response:", response.data)
+      console.log('🚀 ~ response:', response.data);
       setSuccessMessage('Registro exitoso. Redirigiendo al login...');
       setTimeout(() => {
         router.push('/login');
@@ -40,9 +49,10 @@ export default function RegisterPage() {
   };
 
   return (
-
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      {successMessage && <div className="success-message">{successMessage}</div>}
+      {successMessage && (
+        <div className="success-message">{successMessage}</div>
+      )}
       <div className="max-w-md w-full space-y-8 p-10 bg-white shadow rounded-lg">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
@@ -72,6 +82,17 @@ export default function RegisterPage() {
             onChange={(e) => setPassword(e.target.value)}
           />
 
+          <Select value={role} onValueChange={setRole} className="w-full">
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select role" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectItem value="CUSTOMER">Customer</SelectItem>
+                <SelectItem value="ADMIN">Admin</SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
 
           <Button type="submit">Create Account</Button>
           <div className="text-center text-sm text-gray-500">

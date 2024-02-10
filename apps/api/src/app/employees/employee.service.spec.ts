@@ -2,7 +2,6 @@ import { EmployeesController } from './employee.controllers';
 import { Test, TestingModule } from '@nestjs/testing';
 import { EmployeesService } from './employee.service';
 import { ConflictException } from '@nestjs/common';
-import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../../prisma.service';
 describe('EmployeesService', () => {
   let employeesService: EmployeesService;
@@ -33,7 +32,6 @@ describe('EmployeesService', () => {
       jest.spyOn(employeesService, 'createEmployee').mockResolvedValue({
         id: 2,
         ...employeeDto,
-        password: bcrypt.hashSync(employeeDto.password, 10),
       });
 
       const result = await employeesService.createEmployee(employeeDto);
@@ -48,7 +46,6 @@ describe('EmployeesService', () => {
       jest.spyOn(employeesService, 'createEmployee').mockRejectedValue(new ConflictException());
       await expect(employeesService.createEmployee({
         email: 'test@example.com',
-        password: 'pass123',
         name: 'John Doe',
         payType: 'hourly',
         payRate: 20
@@ -63,7 +60,6 @@ describe('EmployeesService', () => {
       jest.spyOn(employeesService, 'updateEmployee').mockResolvedValue({
         id: employeeId,
         email: 'jane.doe@example.com',
-        password: 'encryptedPassword',
         name: 'Jane Doe',
         payType: 'hourly',
         payRate: 25,

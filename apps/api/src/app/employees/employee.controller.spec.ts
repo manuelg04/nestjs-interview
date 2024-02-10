@@ -45,7 +45,6 @@ describe('EmployeesController', () => {
       jest.spyOn(controller, 'createEmployee').mockRejectedValue(new ConflictException());
       await expect(controller.createEmployee({
         email: 'test@example.com',
-        password: 'pass123',
         name: 'John Doe',
         payType: 'hourly',
         payRate: 20
@@ -109,7 +108,6 @@ describe('EmployeesController', () => {
         {
         id: 1,
         email: 'jane.doe@example.com',
-        password: 'encryptedPassword',
         name: 'Jane Doe',
         payType: 'hourly',
         payRate: 25,
@@ -117,7 +115,6 @@ describe('EmployeesController', () => {
         {
         id: 2,
         email: 'jane.doe@example.com',
-        password: 'encryptedPassword',
         name: 'Jane Doee',
         payType: 'hourly',
         payRate: 25,
@@ -136,7 +133,6 @@ describe('EmployeesController', () => {
       jest.spyOn(controller, 'getEmployee').mockResolvedValue({
         id: employeeId,
         email: 'jane.doe@example.com',
-        password: 'encryptedPassword',
         name: 'Jane Doee',
         payType: 'hourly',
         payRate: 25,

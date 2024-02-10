@@ -3,7 +3,6 @@ import { JwtService } from "@nestjs/jwt";
 import { PrismaService } from "../../prisma.service";
 import { EmployeesService } from "../employees/employee.service";
 import { Injectable, NotFoundException } from '@nestjs/common';
-import * as bcrypt from 'bcrypt';
 import { RegisterEmployeeDto } from './dto/register-employee.dto';
 import { Employees } from '../employees/employee.model';
 
@@ -17,7 +16,7 @@ export class AuthService {
     ) {}
 
     async login(loginDto: LoginDto) {
-      const { email, password } = loginDto;
+      const { email } = loginDto;
       const employee = await this.prismaService.employee.findUnique({
         where: {
           email
@@ -25,12 +24,6 @@ export class AuthService {
       });
       if (!employee) {
         throw new NotFoundException('Employee not found');
-      }
-
-      const validatePassword = bcrypt.compare(password, employee.password);
-
-      if (!validatePassword) {
-        throw new NotFoundException('Invalid credentials');
       }
 
       return {
@@ -42,7 +35,6 @@ export class AuthService {
     async register(createDto: RegisterEmployeeDto){
       const createEmployees = new Employees();
       createEmployees.email = createDto.email;
-      createEmployees.password = await  bcrypt.hash(createDto.password, 10);
       createEmployees.name = createDto.name;
       createEmployees.payRate = createDto.payRate;
       createEmployees.payType = createDto.payType;

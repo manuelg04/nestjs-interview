@@ -25,17 +25,13 @@ export class EmployeesService {
 
   async createEmployee(data: {
     email: string;
-    password: string;
     name: string;
     payType: string;
     payRate: number;
   }): Promise<Employees> {
     if (data.payType === 'hourly' && data.payRate < MINIMUM_WAGE.hourly) {
       throw new BadRequestException('Hourly rate is below the minimum wage');
-    } else if (
-      data.payType === 'salary' &&
-      data.payRate < MINIMUM_WAGE.salary
-    ) {
+    } else if (data.payType === 'salary' && data.payRate < MINIMUM_WAGE.salary) {
       throw new BadRequestException('Salary is below the minimum wage');
     }
 
@@ -47,11 +43,20 @@ export class EmployeesService {
       if (existingEmployee) {
         throw new ConflictException('Employee already exists');
       }
-      return this.prisma.employee.create({ data });
+
+      return this.prisma.employee.create({
+        data: {
+          email: data.email,
+          name: data.name,
+          payType: data.payType,
+          payRate: data.payRate,
+        },
+      });
     } catch (error) {
       throw new InternalServerErrorException('Failed to create employee');
     }
   }
+
 
   async updateEmployee(
     id: number,

@@ -15,7 +15,6 @@ datasource db {
 model Employee {
   id         Int      @id @default(autoincrement())
   email      String   @unique
-  password   String
   name       String
   payType    String
   payRate    Float
@@ -32,4 +31,10 @@ model Timesheet {
   employee     Employee @relation(fields: [employeeId], references: [id])
   status       String
   notes        String?
+}
+
+model adminUser {
+  id       Int      @id @default(autoincrement())
+  email    String   @unique
+  password String
 }

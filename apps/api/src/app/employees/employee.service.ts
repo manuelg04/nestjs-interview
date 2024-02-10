@@ -110,4 +110,18 @@ export class EmployeesService {
       throw new InternalServerErrorException('Failed to delete employee');
     }
   }
+
+  async findOneEmployee(id: number): Promise<Employees> {
+    try {
+      const employee = await this.prisma.employee.findUnique({
+        where: { id },
+      });
+      if (!employee) {
+        throw new NotFoundException(`Employee with ID ${id} not found`);
+      }
+      return employee;
+    } catch (error) {
+      throw new InternalServerErrorException('Failed to get employee');
+    }
+  }
 }

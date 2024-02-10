@@ -1,7 +1,7 @@
 import { LoginDto } from './dto/login-employee.dto';
 import { JwtService } from "@nestjs/jwt";
 import { PrismaService } from "../../prisma.service";
-import { EmployeesService } from "../employees/employees.service";
+import { EmployeesService } from "../employees/employee.service";
 import { Injectable, NotFoundException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { RegisterEmployeeDto } from './dto/register-employee.dto';

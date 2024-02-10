@@ -1,6 +1,6 @@
-import { EmployeesController } from './employees.controllers';
+import { EmployeesController } from './employee.controllers';
 import { Test, TestingModule } from '@nestjs/testing';
-import { EmployeesService } from './employees.service';
+import { EmployeesService } from './employee.service';
 import { ConflictException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../../prisma.service';

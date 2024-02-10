@@ -6,8 +6,8 @@ import { JwtStrategy } from './jwt.strategy';
 
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
-import { EmployeesService } from '../employees/employees.service';
-import { EmployeesModule } from '../employees/employees.module';
+import { EmployeesService } from '../employees/employee.service';
+import { EmployeesModule } from '../employees/employee.module';
 
 
 

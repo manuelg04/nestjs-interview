@@ -3,7 +3,7 @@ import { AuthService } from './auth.service';
 import { JwtService } from '@nestjs/jwt';
 import { NotFoundException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import { EmployeesService } from '../employees/employees.service';
+import { EmployeesService } from '../employees/employee.service';
 import { PrismaService } from '../../prisma.service';
 import { LoginDto } from './dto/login-employee.dto';
 

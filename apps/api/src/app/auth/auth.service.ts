@@ -1,10 +1,11 @@
-import { LoginDto } from './dto/login-employee.dto';
+
 import { JwtService } from "@nestjs/jwt";
 import { PrismaService } from "../../prisma.service";
-import { EmployeesService } from "../employees/employee.service";
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { RegisterEmployeeDto } from './dto/register-employee.dto';
-import { Employees } from '../employees/employee.model';
+import { UserService } from '../users/user.service';
+import { CreateUserDto } from './dto/create-user-dto';
+import { LoginUserDto } from './dto/LoginUserDto';
+import { adminUser } from "../users/user.model";
 
 @Injectable()
 export class AuthService {
@@ -12,10 +13,10 @@ export class AuthService {
   constructor(
     private readonly prismaService: PrismaService,
     private jwtService: JwtService,
-    private readonly employeeService: EmployeesService
+    private readonly userService: UserService
     ) {}
 
-    async login(loginDto: LoginDto) {
+    async login(loginDto: LoginUserDto) {
       const { email } = loginDto;
       const employee = await this.prismaService.employee.findUnique({
         where: {
@@ -32,15 +33,12 @@ export class AuthService {
 
     }
 
-    async register(createDto: RegisterEmployeeDto){
-      const createEmployees = new Employees();
-      createEmployees.email = createDto.email;
-      createEmployees.name = createDto.name;
-      createEmployees.payRate = createDto.payRate;
-      createEmployees.payType = createDto.payType;
+    async register(createDto: CreateUserDto){
+      const createAdminUser = new adminUser();
+      createAdminUser.email = createDto.email;
+      createAdminUser.password = createDto.password;
 
-
-      const employee = await this.employeeService.createEmployee(createEmployees);
+      const employee = await this.userService.createAdminUser(createAdminUser);
 
       return {
         token: this.jwtService.sign({ email: employee.email, id: employee.id }),

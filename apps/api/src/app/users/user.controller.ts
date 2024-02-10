@@ -7,7 +7,7 @@ import { UserService } from './user.service';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Post('register')
+  @Post('create-admin-user')
   async register(@Body() createUserDto: CreateUserDto) {
     return this.userService.createAdminUser(createUserDto);
   }

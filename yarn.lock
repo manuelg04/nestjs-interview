@@ -4863,6 +4863,7 @@ __metadata:
     rxjs: "npm:^7.8.0"
     shadcn-ui: "npm:^0.8.0"
     source-map-support: "npm:^0.5.21"
+    sweetalert2: "npm:^11.10.5"
     tailwind-merge: "npm:^2.2.0"
     tailwindcss: "npm:^3.3.0"
     tailwindcss-animate: "npm:^1.0.7"
@@ -23019,6 +23020,13 @@ __metadata:
     oas-validate: oas-validate.js
     swagger2openapi: swagger2openapi.js
   checksum: f95fe71d306ff2b5763aaa488465c4f111810a6a19f233d3ed63495a544c040d544b914921d8362e31137290bb249585e07944bd91fbb1ecad2ad6e60e9c5a72
+  languageName: node
+  linkType: hard
+
+"sweetalert2@npm:^11.10.5":
+  version: 11.10.5
+  resolution: "sweetalert2@npm:11.10.5"
+  checksum: 69cb7ca0dce48933d39431069df4b85ce2e99911bb04d1bedc2870e4569ea6505dfacd72490cdb1b099565953dcb6c52ffe9673601f4046427d00fb1696736b1
   languageName: node
   linkType: hard
 

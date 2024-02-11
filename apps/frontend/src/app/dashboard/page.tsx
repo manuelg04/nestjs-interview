@@ -14,15 +14,25 @@ import { EmployeeDialog } from '../helpers/createEmployeeModal';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Employee } from '../entities/employee';
+import { useRouter } from 'next/navigation';
+import Swal from 'sweetalert2';
 
 export default function Dashboard() {
   const [isEmployeeDialogOpen, setEmployeeDialogOpen] = useState(false);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
-
+  const router = useRouter();
 
   const openEmployeeDialog = () => setEmployeeDialogOpen(true);
   const closeEmployeeDialog = () => setEmployeeDialogOpen(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      // Si no hay token, redirigir al login
+      router.push('/login');
+    }
+  }, [router]);
 
   const fetchEmployees = async () => {
     try {
@@ -62,10 +72,19 @@ export default function Dashboard() {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log('Employee saved:', response.data);
+      if(response.status === 201) {
+        Swal.fire({
+          title: "Its done!",
+          text: "Employee created successfully.",
+          icon: "success"
+        });
+
+        fetchEmployees();
+      }
       closeEmployeeDialog();
 
     } catch (error) {
+
       console.error('Error saving employee:', error.response?.data || error.message);
     }
   };
@@ -78,13 +97,22 @@ export default function Dashboard() {
         return;
       }
 
-      await axios.put(`http://localhost:3000/api/employees/${selectedEmployee?.id}`, employeeData, {
+      const response = await axios.put(`http://localhost:3000/api/employees/${selectedEmployee?.id}`, employeeData, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
 
-      fetchEmployees();
+      if(response.status === 200) {
+        Swal.fire({
+          title: "Its done!",
+          text: "Employee updated successfully.",
+          icon: "success"
+        });
+
+        fetchEmployees();
+      }
+
       closeEmployeeDialog();
       setSelectedEmployee(null);
     } catch (error) {
@@ -100,11 +128,19 @@ export default function Dashboard() {
         return;
       }
 
-      await axios.delete(`http://localhost:3000/api/employees/${employeeId}`, {
+      const response = await axios.delete(`http://localhost:3000/api/employees/${employeeId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
+
+      if(response.status === 200) {
+        Swal.fire({
+          title: "Its done!",
+          text: "Employee deleted successfully.",
+          icon: "success"
+        });
+      }
 
       // Actualiza el estado para excluir al empleado eliminado
       setEmployees(employees.filter(employee => employee.id !== employeeId));

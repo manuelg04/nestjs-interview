@@ -20,6 +20,7 @@ export default function TimesheetManagement() {
   const [timesheets, setTimesheets] = useState<Timesheet[]>([]);
 
   const openTimesheetDialog = () => setIsTimesheetDialogOpen(true);
+  const totalGrossWages = timesheets.reduce((acc, timesheet) => acc + timesheet.grossWage, 0);
   const handleEditClick = (timesheet) => {
     console.log('🚀 ~ handleEditClick ~ timesheet', timesheet);
     setSelectedTimesheet(timesheet);
@@ -169,6 +170,16 @@ export default function TimesheetManagement() {
                     </TableCell>
             </TableRow>
           ))}
+  <TableRow>
+          {/* Celda vacía para todas las columnas excepto "Gross Wage" y "Actions" */}
+          <TableCell colSpan={3}></TableCell>
+          {/* Celda para el total de salarios brutos */}
+          <TableCell className="text-left pl-1">
+            Total Gross Wages: ${totalGrossWages.toFixed(2)}
+          </TableCell>
+          {/* Celda vacía para la columna "Actions" */}
+          <TableCell></TableCell>
+        </TableRow>
         </TableBody>
       </Table>
       {isTimesheetDialogOpen && (
@@ -180,6 +191,7 @@ export default function TimesheetManagement() {
           employees={employees}
         />
       )}
+
     </div>
   );
 }

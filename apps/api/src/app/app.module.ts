@@ -5,12 +5,14 @@ import { AuthModule } from './auth/auth.module';
 // import { HelloCommand } from '@ocmi/api/commands/hello.command';
 import { PrismaModule } from 'nestjs-prisma';
 import { EmployeesModule } from './employees/employee.module';
+import { TimesheetModule } from './timesheets/timesheet.module';
 
 @Module({
   imports: [
     PrismaModule,
     AuthModule,
-    EmployeesModule
+    EmployeesModule,
+    TimesheetModule,
   ],
   controllers: [AppController],
   providers: [

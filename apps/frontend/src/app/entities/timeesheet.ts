@@ -1,4 +1,4 @@
-export class Timesheet {
+export interface Timesheet {
   id: number;
   employeeId: number;
   hoursWorked?: number;
@@ -6,4 +6,6 @@ export class Timesheet {
   checkDate: Date;
   status: string;
   notes?: string;
+  employeeName?: string;
+  employeePayRate?: number;
 }

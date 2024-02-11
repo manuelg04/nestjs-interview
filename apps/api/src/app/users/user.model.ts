@@ -6,5 +6,4 @@ export class User implements Prisma.UserCreateInput {
   role: UserRole;
 }
 
-// src/models/user-role.enum.ts
 

@@ -30,10 +30,11 @@ export class TimesheetService {
   async createTimesheet(
     createTimesheetDto: CreateTimesheetDto,
   ): Promise<Timesheet> {
-    const { employeeId, hoursWorked, date, checkDate } = createTimesheetDto;
-
+    const { employeeId, hoursWorked, checkDate } = createTimesheetDto;
+    const date = new Date();
     try {
       const grossWage = await this.calculateGrossWage(employeeId, hoursWorked);
+      const checkDateObj = new Date(checkDate);
 
       return this.prisma.timesheet.create({
         data: {
@@ -41,7 +42,7 @@ export class TimesheetService {
           date,
           hoursWorked,
           grossWage,
-          checkDate,
+          checkDate: checkDateObj,
           status: 'pending', // default status
         },
       });

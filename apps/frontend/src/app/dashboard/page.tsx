@@ -16,21 +16,24 @@ import axios from 'axios';
 import { Employee } from '../entities/employee';
 import { useRouter } from 'next/navigation';
 import Swal from 'sweetalert2';
+import TimesheetManagement from '../timesheet/timesheet';
 
 export default function Dashboard() {
   const [isEmployeeDialogOpen, setEmployeeDialogOpen] = useState(false);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const [activeTab, setActiveTab] = useState('employees');
   const router = useRouter();
 
   const openEmployeeDialog = () => setEmployeeDialogOpen(true);
   const closeEmployeeDialog = () => setEmployeeDialogOpen(false);
 
-  const handleLogout = () => {
-    // Limpiar el token del almacenamiento local
-    localStorage.removeItem('token');
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+  };
 
-    // Redirigir al usuario a la página de inicio de sesión
+  const handleLogout = () => {
+    localStorage.removeItem('token');
     router.push('/login');
   };
 
@@ -38,7 +41,6 @@ export default function Dashboard() {
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
-      // Si no hay token, redirigir al login
       router.push('/login');
     }
   }, [router]);
@@ -58,7 +60,7 @@ export default function Dashboard() {
   };
 
   useEffect(() => {
-    fetchEmployees(); // Llama a la función después de definirla
+    fetchEmployees();
   }, []);
 
   const handleEditClick = (employee) => {
@@ -150,8 +152,6 @@ export default function Dashboard() {
           icon: "success"
         });
       }
-
-      // Actualiza el estado para excluir al empleado eliminado
       setEmployees(employees.filter(employee => employee.id !== employeeId));
 
     } catch (error) {
@@ -167,84 +167,64 @@ export default function Dashboard() {
           <span className="sr-only">Logout</span>
         </Button>
         <nav className="hidden lg:flex flex-1 items-center gap-4 text-sm font-medium">
-          <Link className="font-semibold" href="#">
+          <button onClick={() => handleTabChange('employees')} className={`font-semibold ${activeTab === 'employees' ? 'text-blue-500' : 'text-gray-500'}`}>
             Employee Management
-          </Link>
-          <Link className="text-gray-500 dark:text-gray-400" href="#">
+          </button>
+          <button onClick={() => handleTabChange('timesheets')} className={`ml-4 font-semibold ${activeTab === 'timesheets' ? 'text-blue-500' : 'text-gray-500'}`}>
             Timesheet Management
-          </Link>
+          </button>
         </nav>
         <div className="ml-auto flex items-center gap-4 lg:gap-8">
-          <Button
-            className="rounded-full border w-8 h-8"
-            size="icon"
-            variant="ghost"
-          >
-            <Image
-              alt="Avatar"
-              className="rounded-full"
-              height="32"
-              src="/placeholder.svg"
-              style={{
-                aspectRatio: '32/32',
-                objectFit: 'cover',
-              }}
-              width="32"
-            />
+          <Button className="rounded-full border w-8 h-8" size="icon" variant="ghost">
+            <Image alt="Avatar" className="rounded-full" height="32" src="/placeholder.svg" style={{ aspectRatio: '32/32', objectFit: 'cover', }} width="32" />
             <span className="sr-only">View profile</span>
           </Button>
         </div>
       </header>
       <main className="flex-1 flex flex-col gap-4 p-4 md:gap-8 md:p-6">
         <div className="flex items-center">
-          <h1 className="font-semibold text-lg md:text-2xl">
-            Employee Management
-          </h1>
-          <Button className="ml-auto" size="sm" onClick={openEmployeeDialog}>
-            Add employee
-          </Button>
+          {activeTab === 'employees' && (
+            <Button className="ml-auto" size="sm" onClick={openEmployeeDialog}>
+              Add employee
+            </Button>
+          )}
         </div>
-        <div className="border rounded-lg">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Pay Type</TableHead>
-                <TableHead>Pay Rate</TableHead>
-                <TableHead className="w-[100px]">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {employees.map((employee) => (
-                <TableRow key={employee.id} className="hover:bg-gray-100/50 dark:hover:bg-gray-800/50">
-                  <TableCell className="font-semibold">{employee.name}</TableCell>
-                  <TableCell>{employee.payType}</TableCell>
-                  <TableCell>${employee.payRate.toFixed(2)}</TableCell>
-                  <TableCell className="flex gap-2 min-w-[100px]">
-                    <Button
-                      className="rounded-full w-8 h-8"
-                      size="icon"
-                      variant="ghost"
-                      onClick={() => handleEditClick(employee)}
-                    >
-                      <FileEditIcon className="h-6 w-6" />
-                      <span className="sr-only">Edit</span>
-                    </Button>
-                    <Button
-                      className="rounded-full w-8 h-8"
-                      size="icon"
-                      variant="ghost"
-                      onClick={() => handleDeleteEmployee(employee.id)}
-                    >
-                      <TrashIcon className="h-6 w-6" />
-                      <span className="sr-only">Delete</span>
-                    </Button>
-                  </TableCell>
+        {activeTab === 'employees' && (
+          <div className="border rounded-lg">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Pay Type</TableHead>
+                  <TableHead>Pay Rate</TableHead>
+                  <TableHead className="w-[100px]">Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+              </TableHeader>
+              <TableBody>
+                {employees.map((employee) => (
+                  <TableRow key={employee.id} className="hover:bg-gray-100/50 dark:hover:bg-gray-800/50">
+                    <TableCell className="font-semibold">{employee.name}</TableCell>
+                    <TableCell>{employee.payType}</TableCell>
+                    <TableCell>${employee.payRate.toFixed(2)}</TableCell>
+                    <TableCell className="flex gap-2 min-w-[100px]">
+                      <Button className="rounded-full w-8 h-8" size="icon" variant="ghost" onClick={() => handleEditClick(employee)}>
+                        <FileEditIcon className="h-6 w-6" />
+                        <span className="sr-only">Edit</span>
+                      </Button>
+                      <Button className="rounded-full w-8 h-8" size="icon" variant="ghost" onClick={() => handleDeleteEmployee(employee.id)}>
+                        <TrashIcon className="h-6 w-6" />
+                        <span className="sr-only">Delete</span>
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        )}
+        {activeTab === 'timesheets' && (
+          <TimesheetManagement />
+        )}
       </main>
       {isEmployeeDialogOpen && (
         <EmployeeDialog
@@ -256,6 +236,7 @@ export default function Dashboard() {
       )}
     </div>
   );
+
 }
 
 function FileEditIcon(props) {
@@ -275,27 +256,6 @@ function FileEditIcon(props) {
       <path d="M4 13.5V4a2 2 0 0 1 2-2h8.5L20 7.5V20a2 2 0 0 1-2 2h-5.5" />
       <polyline points="14 2 14 8 20 8" />
       <path d="M10.42 12.61a2.1 2.1 0 1 1 2.97 2.97L7.95 21 4 22l.99-3.95 5.43-5.44Z" />
-    </svg>
-  );
-}
-
-function Package2Icon(props) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M3 9h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9Z" />
-      <path d="m3 9 2.45-4.9A2 2 0 0 1 7.24 3h9.52a2 2 0 0 1 1.8 1.1L21 9" />
-      <path d="M12 3v6" />
     </svg>
   );
 }

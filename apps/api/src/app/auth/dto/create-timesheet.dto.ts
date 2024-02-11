@@ -5,8 +5,6 @@ export class CreateTimesheetDto {
   @IsNumber()
   readonly employeeId: number;
 
-  @IsNotEmpty()
-  @IsDate()
   readonly date: Date;
 
   @IsNumber()

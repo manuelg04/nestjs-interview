@@ -4,7 +4,7 @@ import { Button } from "../../ui/components/button";
 import { Input } from "../../ui/components/input";
 
 export function TimesheetDialog({ isOpen, onSave, onClose, employees, timesheet }) {
-  const [employeeId, setEmployeeId] = useState('')
+  const [employeeId, setEmployeeId] = useState(timesheet ? timesheet.employeeId : (employees[0]?.id || '').toString());
   const [hoursWorked, setHoursWorked] = useState(timesheet ? timesheet.hoursWorked.toString() : '');
   const [checkDate, setCheckDate] = useState(timesheet ? timesheet.checkDate : new Date().toISOString().split('T')[0]);
 

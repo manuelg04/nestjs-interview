@@ -20,6 +20,12 @@ export default function TimesheetManagement() {
   const [timesheets, setTimesheets] = useState<Timesheet[]>([]);
 
   const openTimesheetDialog = () => setIsTimesheetDialogOpen(true);
+  const handleEditClick = (timesheet) => {
+    console.log('🚀 ~ handleEditClick ~ timesheet', timesheet);
+    setSelectedTimesheet(timesheet);
+    openTimesheetDialog();
+  };
+
 
   const closeTimesheetDialog = () => {
     setIsTimesheetDialogOpen(false);
@@ -101,6 +107,25 @@ export default function TimesheetManagement() {
     fetchEmployeesAndTimesheets();
   }, []);
 
+  const handleDeleteTimesheet = async (id) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.delete(`http://localhost:3000/api/timesheets/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.status === 200) {
+        // Actualiza el estado para excluir el timesheet eliminado
+        setTimesheets(timesheets.filter(timesheet => timesheet.id !== id));
+      }
+    } catch (error) {
+      console.error('Error deleting timesheet:', error.response?.data || error.message);
+    }
+  };
+
+
   return (
     <div className="border rounded-lg">
       <div className="flex justify-end p-4">
@@ -133,11 +158,11 @@ export default function TimesheetManagement() {
                 {new Date(timesheet.checkDate).toLocaleDateString()}
               </TableCell>
               <TableCell className="flex gap-2 min-w-[100px]">
-                      <Button className="rounded-full w-8 h-8" size="icon" variant="ghost" onClick={() => handleEditClick(employee)}>
+                      <Button className="rounded-full w-8 h-8" size="icon" variant="ghost" onClick={() => handleEditClick(timesheet)}>
                         <FileEditIcon className="h-6 w-6" />
                         <span className="sr-only">Edit</span>
                       </Button>
-                      <Button className="rounded-full w-8 h-8" size="icon" variant="ghost" onClick={() => handleDeleteEmployee(employee.id)}>
+                      <Button className="rounded-full w-8 h-8" size="icon" variant="ghost" onClick={() => handleDeleteTimesheet(timesheet.id)}>
                         <TrashIcon className="h-6 w-6" />
                         <span className="sr-only">Delete</span>
                       </Button>

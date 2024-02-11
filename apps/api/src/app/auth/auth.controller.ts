@@ -1,4 +1,4 @@
-import { Controller,Post,Body,Req,Res } from "@nestjs/common";
+import { Controller,Post,Body,Req,Res, HttpStatus } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import {Request,Response} from 'express'
 import { LoginDto } from "./dto/login-employee.dto";
@@ -21,10 +21,10 @@ export class AuthController{
               })
 
           }catch(err){
-               return response.status(500).json({
-                    status: 'Error!',
-                    message: 'Internal Server Error!',
-                   })
+            return response.status(HttpStatus.UNAUTHORIZED).json({
+              status: 'Error',
+              message: 'Invalid credentials',
+            });
           }
      }
 

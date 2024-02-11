@@ -26,6 +26,15 @@ export default function Dashboard() {
   const openEmployeeDialog = () => setEmployeeDialogOpen(true);
   const closeEmployeeDialog = () => setEmployeeDialogOpen(false);
 
+  const handleLogout = () => {
+    // Limpiar el token del almacenamiento local
+    localStorage.removeItem('token');
+
+    // Redirigir al usuario a la página de inicio de sesión
+    router.push('/login');
+  };
+
+
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -153,10 +162,10 @@ export default function Dashboard() {
   return (
     <div className="flex flex-col h-screen min-h-screen">
       <header className="flex h-14 items-center border-b px-4 md:px-6">
-        <Link className="mr-6" href="#">
-          <Package2Icon className="h-6 w-6" />
-          <span className="sr-only">Home</span>
-        </Link>
+        <Button className="mr-6" onClick={handleLogout} variant={'outline'}>
+          <LogoutIcon className="h-6 w-6"/>
+          <span className="sr-only">Logout</span>
+        </Button>
         <nav className="hidden lg:flex flex-1 items-center gap-4 text-sm font-medium">
           <Link className="font-semibold" href="#">
             Employee Management
@@ -287,6 +296,26 @@ function Package2Icon(props) {
       <path d="M3 9h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9Z" />
       <path d="m3 9 2.45-4.9A2 2 0 0 1 7.24 3h9.52a2 2 0 0 1 1.8 1.1L21 9" />
       <path d="M12 3v6" />
+    </svg>
+  );
+}
+
+function LogoutIcon(props) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M9 5l7 7-7 7" />
+      <path d="M16 12H9" />
     </svg>
   );
 }

@@ -6,6 +6,7 @@ import { Input } from "../../ui/components/input";
 import { Button } from "../../ui/components/button";
 import Link from "next/link";
 import axios from 'axios';
+import Swal from 'sweetalert2';
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -27,12 +28,20 @@ export default function LoginPage() {
         email,
         password,
       });
+      console.log('🚀 ~ response:', response.data.result);
       localStorage.setItem('token', response.data.result.token);
       router.push('/dashboard');
     } catch (error) {
       console.error('An error occurred', error);
+      setError(error.response?.data?.message || 'An unexpected error occurred');
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: error.response?.data?.message || 'An unexpected error occurred',
+      });
     }
   };
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">

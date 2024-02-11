@@ -11,11 +11,11 @@ import { Select,
 } from "../../ui/components/select";
 import { useState } from 'react';
 
-export function EmployeeDialog({ isOpen, onSave, onClose }) {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [payType, setPayType] = useState('hourly');
-  const [payRate, setPayRate] = useState('');
+export function EmployeeDialog({ isOpen, onSave, onClose, employee }) {
+  const [name, setName] = useState(employee ? employee.name : '');
+  const [email, setEmail] = useState(employee ? employee.email : '');
+  const [payType, setPayType] = useState(employee ? employee.payType : 'hourly');
+  const [payRate, setPayRate] = useState(employee ? employee.payRate.toString() : '');
 
   const handleSave = (event) => {
     event.preventDefault();

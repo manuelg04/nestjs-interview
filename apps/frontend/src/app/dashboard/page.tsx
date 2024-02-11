@@ -18,29 +18,37 @@ import { Employee } from '../entities/employee';
 export default function Dashboard() {
   const [isEmployeeDialogOpen, setEmployeeDialogOpen] = useState(false);
   const [employees, setEmployees] = useState<Employee[]>([]);
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
+
 
   const openEmployeeDialog = () => setEmployeeDialogOpen(true);
   const closeEmployeeDialog = () => setEmployeeDialogOpen(false);
 
-  useEffect(() => {
-    const fetchEmployees = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        const response = await axios.get('http://localhost:3000/api/employees', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setEmployees(response.data);
-      } catch (error) {
-        console.error('Error fetching employees:', error.response?.data || error.message);
-      }
-    };
+  const fetchEmployees = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get('http://localhost:3000/api/employees', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setEmployees(response.data);
+    } catch (error) {
+      console.error('Error fetching employees:', error.response?.data || error.message);
+    }
+  };
 
-    fetchEmployees();
+  useEffect(() => {
+    fetchEmployees(); // Llama a la función después de definirla
   }, []);
 
-  const handleSaveEmployee = async (employeeData) => {
+  const handleEditClick = (employee) => {
+    setSelectedEmployee(employee);
+    openEmployeeDialog();
+  };
+
+
+  const handleSaveEmployee = async (employeeData: Employee) => {
     try {
 
       const token = localStorage.getItem('token');
@@ -62,6 +70,49 @@ export default function Dashboard() {
     }
   };
 
+  const handleEditEmployee = async (employeeData: Employee) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        console.error('Authentication token is not available');
+        return;
+      }
+
+      await axios.put(`http://localhost:3000/api/employees/${selectedEmployee?.id}`, employeeData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      fetchEmployees();
+      closeEmployeeDialog();
+      setSelectedEmployee(null);
+    } catch (error) {
+      console.error('Error updating employee:', error.response?.data || error.message);
+    }
+  };
+
+  const handleDeleteEmployee = async (employeeId: number) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        console.error('Authentication token is not available');
+        return;
+      }
+
+      await axios.delete(`http://localhost:3000/api/employees/${employeeId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      // Actualiza el estado para excluir al empleado eliminado
+      setEmployees(employees.filter(employee => employee.id !== employeeId));
+
+    } catch (error) {
+      console.error('Error deleting employee:', error.response?.data || error.message);
+    }
+  };
 
   return (
     <div className="flex flex-col h-screen min-h-screen">
@@ -129,6 +180,7 @@ export default function Dashboard() {
                       className="rounded-full w-8 h-8"
                       size="icon"
                       variant="ghost"
+                      onClick={() => handleEditClick(employee)}
                     >
                       <FileEditIcon className="h-6 w-6" />
                       <span className="sr-only">Edit</span>
@@ -137,6 +189,7 @@ export default function Dashboard() {
                       className="rounded-full w-8 h-8"
                       size="icon"
                       variant="ghost"
+                      onClick={() => handleDeleteEmployee(employee.id)}
                     >
                       <TrashIcon className="h-6 w-6" />
                       <span className="sr-only">Delete</span>
@@ -151,8 +204,9 @@ export default function Dashboard() {
       {isEmployeeDialogOpen && (
         <EmployeeDialog
           isOpen={isEmployeeDialogOpen}
-          onSave={handleSaveEmployee}
+          onSave={selectedEmployee ? handleEditEmployee : handleSaveEmployee}
           onClose={closeEmployeeDialog}
+          employee={selectedEmployee}
         />
       )}
     </div>

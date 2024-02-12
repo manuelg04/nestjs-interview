@@ -1,5 +1,4 @@
-import { User } from "../users/user.model"; // Asegúrate de que este importe corresponda a la ubicación real de tu modelo User.
-
+import { User } from "../users/user.model";
 export class Employees {
   id: number;
   userId: number;

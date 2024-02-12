@@ -118,7 +118,6 @@ export default function TimesheetManagement() {
       });
 
       if (response.status === 200) {
-        // Actualiza el estado para excluir el timesheet eliminado
         setTimesheets(timesheets.filter(timesheet => timesheet.id !== id));
       }
     } catch (error) {

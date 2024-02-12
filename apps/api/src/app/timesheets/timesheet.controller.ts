@@ -34,6 +34,7 @@ export class TimesheetController {
   }
 
   @Get()
+  @UseGuards(JwtAuthGuard)
   findAllTimesheets(@GetUser() user) {
     try {
       const userId = user.id;

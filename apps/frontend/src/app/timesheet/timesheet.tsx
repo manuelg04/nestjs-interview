@@ -158,6 +158,7 @@ export default function TimesheetManagement() {
               <TableCell>
                 {new Date(timesheet.checkDate).toLocaleDateString()}
               </TableCell>
+              <TableCell>{timesheet.status}</TableCell>
               <TableCell className="flex gap-2 min-w-[100px]">
                       <Button className="rounded-full w-8 h-8" size="icon" variant="ghost" onClick={() => handleEditClick(timesheet)}>
                         <FileEditIcon className="h-6 w-6" />

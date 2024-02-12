@@ -19,16 +19,11 @@ const MINIMUM_WAGE = {
 export class EmployeesService {
   constructor(private prisma: PrismaService) {}
 
-  async getAllEmployees(): Promise<Employees[]> {
+  async getAllEmployees(userId: number): Promise<Employees[]> {
     const employees = await this.prisma.employee.findMany({
-      include: {
-        user: true,
-      },
+      where: { userId },
     });
-    return employees.map(emp => ({
-      ...emp,
-      user: emp.user,
-    }));
+    return employees;
   }
 
   async createEmployee(data: {

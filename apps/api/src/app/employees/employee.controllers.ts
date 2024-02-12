@@ -14,9 +14,10 @@ export class EmployeesController {
 
   @Get()
   @UseGuards(JwtAuthGuard)
-  async getAllEmployees(): Promise<Employees[]> {
+  async getAllEmployees(@GetUser() user): Promise<Employees[]> {
     try {
-      return await this.employeesService.getAllEmployees();
+      const userId = user.id;
+      return await this.employeesService.getAllEmployees(userId);
     } catch (error) {
       throw new HttpException('Failed to get employees', HttpStatus.INTERNAL_SERVER_ERROR);
     }

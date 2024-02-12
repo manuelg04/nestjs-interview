@@ -4,44 +4,60 @@ import {
   Delete,
   Get,
   InternalServerErrorException,
+  NotFoundException,
   Param,
   Patch,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import { CreateTimesheetDto } from '../auth/dto/create-timesheet.dto';
 import { TimesheetService } from './timesheet.service';
 import { UpdateTimesheetDto } from '../auth/dto/update-timesheet.dto';
+import { GetUser } from '../users/user.decorator';
+import { Timesheet } from './timesheet.model';
+import { JwtAuthGuard } from '../auth/auth.guard';
 
 @Controller('timesheets')
 export class TimesheetController {
   constructor(private readonly timesheetService: TimesheetService) {}
 
   @Post()
-  async createTimesheet(@Body() createTimesheetDto: CreateTimesheetDto) {
+  @UseGuards(JwtAuthGuard)
+  async createTimesheet(@Body() createTimesheetDto: CreateTimesheetDto, @GetUser() user) {
+
     try {
-      return this.timesheetService.createTimesheet(createTimesheetDto);
+      const userId = user.id;
+      return this.timesheetService.createTimesheet(createTimesheetDto,userId);
     } catch (err) {
       throw new InternalServerErrorException('Error creating timesheet');
     }
   }
 
   @Get()
-  findAllTimesheets() {
+  findAllTimesheets(@GetUser() user) {
     try {
-      return this.timesheetService.findAllTimesheets();
+      const userId = user.id;
+      return this.timesheetService.findAllTimesheets(userId);
     } catch (error) {
       throw new InternalServerErrorException('Error fetching timesheets');
     }
   }
 
   @Get(':id')
-  findOneTimesheet(@Param('id') id: number) {
+  @UseGuards(JwtAuthGuard)
+  async findOneTimesheet(@Param('id') id: number, @GetUser() user): Promise<Timesheet> {
     try {
-      return this.timesheetService.findOneTimesheet(+id);
+      const userId = user.id;
+      const timesheet =  await this.timesheetService.findOneTimesheet(id, userId);
+      if (!timesheet) {
+        throw new NotFoundException(`Timesheet with ID ${id} not found`);
+      }
+      return timesheet;
     } catch (error) {
       throw new InternalServerErrorException('Error fetching timesheet');
     }
   }
+
 
   @Patch(':id')
   updateTimesheet(

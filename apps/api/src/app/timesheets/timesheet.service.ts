@@ -29,6 +29,7 @@ export class TimesheetService {
 
   async createTimesheet(
     createTimesheetDto: CreateTimesheetDto,
+    userId: number,
   ): Promise<Timesheet> {
     const { employeeId, hoursWorked, checkDate } = createTimesheetDto;
     const date = new Date();
@@ -44,6 +45,10 @@ export class TimesheetService {
           grossWage,
           checkDate: checkDateObj,
           status: 'pending', // default status
+          userId
+        },
+        include: {
+          user: true,
         },
       });
     } catch (error) {
@@ -51,28 +56,40 @@ export class TimesheetService {
     }
   }
 
-  async findAllTimesheets(): Promise<Timesheet[]> {
+  async findAllTimesheets(userId: number): Promise<Timesheet[]> {
     try {
-      return this.prisma.timesheet.findMany();
+      return this.prisma.timesheet.findMany({
+        where: { userId },
+        include: {
+          user: true,
+        },
+      });
     } catch (error) {
       throw new InternalServerErrorException('Error fetching timesheets');
     }
   }
 
-  async findOneTimesheet(id: number): Promise<Timesheet> {
-
+  async findOneTimesheet(id: number, userId: number): Promise<Timesheet> {
     try {
-      const timesheet = await this.prisma.timesheet.findUnique({
-        where: { id },
+      const timesheet = await this.prisma.timesheet.findFirst({
+        where: {
+          id,
+          userId,
+        },
+        include: {
+          user: true,
+        },
       });
+
       if (!timesheet)
-        throw new NotFoundException(`Timesheet with ID ${id} not found`);
+        throw new NotFoundException(`Timesheet with ID ${id} not found for user ID ${userId}`);
 
       return timesheet;
     } catch (error) {
       throw new InternalServerErrorException('Error fetching timesheet');
     }
   }
+
 
 
 
@@ -83,6 +100,9 @@ export class TimesheetService {
     try {
       return this.prisma.timesheet.update({
         where: { id },
+        include: {
+          user: true,
+        },
         data: updateTimesheetDto,
       });
     } catch (error) {

@@ -6,6 +6,7 @@ import { JwtAuthGuard } from '../auth/auth.guard';
 import { Employees } from './employee.model';
 import { RegisterEmployeeDto } from '../auth/dto/register-employee.dto';
 import { EmployeeUpdateDto } from '../auth/dto/employee-update.dto';
+import { GetUser } from '../users/user.decorator';
 
 @Controller('employees')
 export class EmployeesController {
@@ -20,12 +21,14 @@ export class EmployeesController {
       throw new HttpException('Failed to get employees', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
-  
+
   @Post()
   @UseGuards(JwtAuthGuard)
-  async createEmployee(@Body() createDto: RegisterEmployeeDto): Promise<Employees> {
+  async createEmployee(@Body() createDto: RegisterEmployeeDto,  @GetUser() user): Promise<Employees> {
     try {
-      return await this.employeesService.createEmployee(createDto);
+      const userId = user.id;
+      const employeeData = { ...createDto, userId };
+      return await this.employeesService.createEmployee(employeeData);
     } catch (error) {
       if (error.status) {
         throw error;
@@ -37,9 +40,10 @@ export class EmployeesController {
 
   @Get(':id')
   @UseGuards(JwtAuthGuard)
-  async getEmployee(@Param('id') id: number): Promise<Employees> {
+  async getEmployee(@Param('id') id: number, @GetUser() user ): Promise<Employees> {
+    const userId = user.id;
     try {
-      return await this.employeesService.findOneEmployee(+id);
+      return await this.employeesService.findOneEmployee(+id, userId);
     } catch (error) {
       if (error.status) {
         throw error;
@@ -49,11 +53,13 @@ export class EmployeesController {
     }
   }
 
+
   @Put(':id')
   @UseGuards(JwtAuthGuard)
-  async updateEmployee(@Param('id') id: number, @Body() updateDto: EmployeeUpdateDto): Promise<Employees> {
+  async updateEmployee(@Param('id') id: number, @Body() updateDto: EmployeeUpdateDto, @GetUser() user): Promise<Employees> {
     try {
-      return await this.employeesService.updateEmployee(+id, updateDto);
+      const userId = user.id;
+      return await this.employeesService.updateEmployee(id, userId, updateDto);
     } catch (error) {
       if (error.status) {
         throw error;
@@ -65,9 +71,10 @@ export class EmployeesController {
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
-  async deleteEmployee(@Param('id') id: number): Promise<{ id: number }> {
+  async deleteEmployee(@Param('id') id: number, @GetUser() user ): Promise<{ id: number }> {
     try {
-      return await this.employeesService.deleteEmployee(+id);
+      const userId = user.id;
+      return await this.employeesService.deleteEmployee(+id, userId);
     } catch (error) {
       if (error.status) {
         throw error;

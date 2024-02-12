@@ -13,8 +13,10 @@ datasource db {
 
 
 model Employee {
-  id         Int      @id @default(autoincrement())
-  email      String   @unique
+  id         Int         @id @default(autoincrement())
+  userId     Int
+  user       User        @relation(fields: [userId], references: [id])
+  email      String      @unique
   name       String
   payType    String
   payRate    Float
@@ -31,13 +33,17 @@ model Timesheet {
   employee     Employee @relation(fields: [employeeId], references: [id])
   status       String
   notes        String?
+  userId       Int
+  user         User      @relation(fields: [userId], references: [id])
 }
 
 model User {
-  id       Int      @id @default(autoincrement())
-  email    String   @unique
-  password String
-  role     UserRole @default(CUSTOMER)
+  id          Int         @id @default(autoincrement())
+  email       String      @unique
+  password    String
+  role        UserRole    @default(CUSTOMER)
+  employees   Employee[]
+  timesheets  Timesheet[] 
 }
 
 enum UserRole {

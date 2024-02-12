@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../../prisma.service';
 import { Employees } from './employee.model';
+import { EmployeeUpdateDto } from '../auth/dto/employee-update.dto';
 
 const MINIMUM_WAGE = {
   hourly: 12.0,
@@ -19,7 +20,15 @@ export class EmployeesService {
   constructor(private prisma: PrismaService) {}
 
   async getAllEmployees(): Promise<Employees[]> {
-    return this.prisma.employee.findMany();
+    const employees = await this.prisma.employee.findMany({
+      include: {
+        user: true,
+      },
+    });
+    return employees.map(emp => ({
+      ...emp,
+      user: emp.user,
+    }));
   }
 
   async createEmployee(data: {
@@ -27,6 +36,7 @@ export class EmployeesService {
     name: string;
     payType: string;
     payRate: number;
+    userId: number;
   }): Promise<Employees> {
     if (data.payType === 'hourly' && data.payRate < MINIMUM_WAGE.hourly) {
       throw new BadRequestException('Hourly rate is below the minimum wage');
@@ -45,10 +55,7 @@ export class EmployeesService {
 
       return this.prisma.employee.create({
         data: {
-          email: data.email,
-          name: data.name,
-          payType: data.payType,
-          payRate: data.payRate,
+        ...data,
         },
       });
     } catch (error) {
@@ -59,13 +66,8 @@ export class EmployeesService {
 
   async updateEmployee(
     id: number,
-    updateData: {
-      email?: string;
-      password?: string;
-      name?: string;
-      payType?: string;
-      payRate?: number;
-    },
+    userId: number,
+    updateData: EmployeeUpdateDto,
   ): Promise<Employees> {
     if (
       updateData.payType === 'hourly' &&
@@ -80,26 +82,30 @@ export class EmployeesService {
     }
     try {
       const employeeExists = await this.prisma.employee.findUnique({
-        where: { id },
+        where: { id, userId },
       });
 
       if (!employeeExists) {
         throw new NotFoundException(`Employee with ID ${id} not found`);
       }
 
-      return this.prisma.employee.update({
+      const updatedEmployee = await this.prisma.employee.update({
         where: { id },
         data: updateData,
+        include: {
+          user: true,
+        },
       });
+      return updatedEmployee;
     } catch (error) {
       throw new InternalServerErrorException('Failed to update employee');
     }
   }
 
-  async deleteEmployee(id: number): Promise<{ id: number; }> {
+  async deleteEmployee(id: number, userId:number): Promise<{ id: number; }> {
     try {
       const employeeExists = await this.prisma.employee.findUnique({
-        where: { id },
+        where: { id, userId  },
       });
 
       if (!employeeExists) {
@@ -115,10 +121,13 @@ export class EmployeesService {
     }
   }
 
-  async findOneEmployee(id: number): Promise<Employees> {
+  async findOneEmployee(id: number, userId: number ): Promise<Employees> {
     try {
-      const employee = await this.prisma.employee.findUnique({
-        where: { id },
+      const employee = await this.prisma.employee.findFirst({
+        where: {
+           id,
+          userId
+          },
       });
       if (!employee) {
         throw new NotFoundException(`Employee with ID ${id} not found`);

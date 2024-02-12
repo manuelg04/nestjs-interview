@@ -6,6 +6,8 @@ import { AuthModule } from './auth/auth.module';
 import { PrismaModule } from 'nestjs-prisma';
 import { EmployeesModule } from './employees/employee.module';
 import { TimesheetModule } from './timesheets/timesheet.module';
+import { UserService } from './users/user.service';
+import { UserModule } from './users/user.module';
 
 @Module({
   imports: [
@@ -17,6 +19,7 @@ import { TimesheetModule } from './timesheets/timesheet.module';
   controllers: [AppController],
   providers: [
     AppService,
+    UserService,
     // HelloCommand
   ],
 })

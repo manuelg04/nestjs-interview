@@ -1,3 +1,4 @@
+import { CreateTimesheetDto } from './../auth/dto/create-timesheet.dto';
 import { TimesheetController } from './timesheet.controller';
 import { TimesheetService } from './timesheet.service';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -24,19 +25,22 @@ describe('EmployeesService', () => {
   describe('createTimesheet', () => {
     it('should create an timesheet successfully', async () => {
       const CreateTimesheetDto = {
+        id: 1,
         employeeId: 1,
-        date: new Date(),
         hoursWorked: 8,
         grossWage: 160,
         checkDate: new Date(),
         status: 'pending', // default status
+        notes: 'notes',
       };
+      const userId = 1;
       jest.spyOn(timesheetService, 'createTimesheet').mockResolvedValue({
+        userId: 1,
         id: 2,
         ...CreateTimesheetDto,
       });
 
-      const result = await timesheetService.createTimesheet(CreateTimesheetDto);
+      const result = await timesheetService.createTimesheet(CreateTimesheetDto, userId);
       expect(result).toEqual(expect.objectContaining({
         ...CreateTimesheetDto,
         id: expect.any(Number)
@@ -45,12 +49,16 @@ describe('EmployeesService', () => {
 
     it('should throw a ConflictException for duplicate timesheet', async () => {
       jest.spyOn(timesheetService, 'createTimesheet').mockRejectedValue(new ConflictException());
-      await expect(timesheetService.createTimesheet({
+      const createTimesheetDto: CreateTimesheetDto = {
         employeeId: 1,
-        date: new Date(),
         hoursWorked: 8,
         checkDate: new Date(),
-      })).rejects.toThrow(ConflictException);
+      };
+      const userId = 1;
+      await expect(timesheetService.createTimesheet({
+        ...createTimesheetDto,
+        employeeId: 1,
+      }, userId)).rejects.toThrow(ConflictException);
     });
   });
 
@@ -59,13 +67,14 @@ describe('EmployeesService', () => {
       const timesheetId = 1;
       const UpdateTimesheetDto = {
         employeeId: 1,
-        date: new Date(),
         hoursWorked: 8,
         grossWage: 160,
         checkDate: new Date(),
         status: 'pending', // default status
       };
+      const userId = 1;
       jest.spyOn(timesheetService, 'updateTimesheet').mockResolvedValue({
+        userId,
         id: timesheetId,
         ...UpdateTimesheetDto,
       });
@@ -86,20 +95,21 @@ describe('EmployeesService', () => {
 
   describe('findAllTimesheets', () => {
     it('should fetch all timesheets successfully', async () => {
+      const userId = 1;
       jest.spyOn(timesheetService, 'findAllTimesheets').mockResolvedValue([
         {
+          userId,
           id: 1,
           employeeId: 1,
-          date: new Date(),
           hoursWorked: 8,
           grossWage: 160,
           checkDate: new Date(),
           status: 'pending', // default status
         },
         {
+          userId,
           id: 2,
           employeeId: 1,
-          date: new Date(),
           hoursWorked: 8,
           grossWage: 160,
           checkDate: new Date(),
@@ -107,7 +117,7 @@ describe('EmployeesService', () => {
         }
       ]);
 
-      const result = await timesheetService.findAllTimesheets();
+      const result = await timesheetService.findAllTimesheets(userId);
       expect(result).toHaveLength(2);
     });
   });
@@ -116,25 +126,26 @@ describe('EmployeesService', () => {
   describe('findOneTimesheet', () => {
     it('should fetch one timesheet successfully', async () => {
       const timesheetId = 1;
+      const userId = 1;
       jest.spyOn(timesheetService, 'findOneTimesheet').mockResolvedValue({
+        userId,
         id: timesheetId,
         employeeId: 1,
-        date: new Date(),
         hoursWorked: 8,
         grossWage: 160,
         checkDate: new Date(),
         status: 'pending', // default status
       });
 
-      const result = await timesheetService.findOneTimesheet(timesheetId);
+      const result = await timesheetService.findOneTimesheet(timesheetId, userId);
       expect(result).toEqual(expect.objectContaining({
         id: timesheetId,
         employeeId: 1,
-        date: expect.any(Date),
         hoursWorked: 8,
         grossWage: 160,
         checkDate: expect.any(Date),
         status: 'pending', // default status
+        userId,
       }));
     });
   });

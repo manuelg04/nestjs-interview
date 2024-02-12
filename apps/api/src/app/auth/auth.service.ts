@@ -2,7 +2,6 @@
 import { JwtService } from "@nestjs/jwt";
 import { PrismaService } from "../../prisma.service";
 import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
-import { UserService } from '../users/user.service';
 import { CreateUserDto } from './dto/create-user-dto';
 import { LoginUserDto } from './dto/LoginUserDto';
 import * as bcrypt from 'bcrypt';
@@ -12,7 +11,6 @@ export class AuthService {
   constructor(
     private readonly prismaService: PrismaService,
     private jwtService: JwtService,
-    private readonly userService: UserService
     ) {}
 
     async login(loginDto: LoginUserDto) {

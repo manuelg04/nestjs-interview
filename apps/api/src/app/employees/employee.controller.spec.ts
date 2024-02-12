@@ -22,7 +22,9 @@ describe('EmployeesController', () => {
 
   describe('createEmployee', () => {
     it('should create a employee successfully', async () => {
+      const userId = 1;
       const employeeDto = {
+        userId,
         email: 'test@example.com',
         password: 'pass123',
         name: 'John Doe',
@@ -34,7 +36,7 @@ describe('EmployeesController', () => {
         ...employeeDto,
       });
 
-      const result = await controller.createEmployee(employeeDto);
+      const result = await controller.createEmployee(employeeDto, userId);
       expect(result).toEqual(expect.objectContaining({
         ...employeeDto,
         id: expect.any(Number)
@@ -43,20 +45,27 @@ describe('EmployeesController', () => {
 
     it('should throw a ConflictException for duplicate employee', async () => {
       jest.spyOn(controller, 'createEmployee').mockRejectedValue(new ConflictException());
-      await expect(controller.createEmployee({
+      const user = { id: 1 }; // Mock user object
+      const employeeDto = {
         email: 'test@example.com',
         name: 'John Doe',
         payType: 'hourly',
-        payRate: 20
-      })).rejects.toThrow(ConflictException);
+        payRate: 20,
+      };
+
+      // Now call createEmployee with both the employeeDto and the mock user
+      await expect(controller.createEmployee(employeeDto, user)).rejects.toThrow(ConflictException);
     });
+
   });
 
 
   describe('updateEmployee', () => {
     it('should update a employee successfully', async () => {
       const employeeId = 1;
+      const user = { id: 1 };
       const UpdateEmployeeDto = {
+
         id: employeeId,
         email: 'jane.doe@example.com',
         password: 'encryptedPassword',
@@ -66,46 +75,53 @@ describe('EmployeesController', () => {
       };
       jest.spyOn(controller, 'updateEmployee').mockResolvedValue({
         id: employeeId,
+        userId: user.id,
         ...UpdateEmployeeDto,
       });
 
-      const result = await controller.updateEmployee(employeeId, UpdateEmployeeDto);
+      const result = await controller.updateEmployee(employeeId,UpdateEmployeeDto, user);
       expect(result).toEqual(expect.objectContaining({
         ...UpdateEmployeeDto,
-        id: employeeId
+        id: employeeId,
+        userId: user.id,
       }));
     });
 
     it('should throw a NotFoundException for non-existing employee', async () => {
+      const user = { id: 1};
       jest.spyOn(controller, 'updateEmployee').mockRejectedValue(new NotFoundException());
-      await expect(controller.updateEmployee(999, {
-      })).rejects.toThrow(NotFoundException);
+      await expect(controller.updateEmployee(999, {}, user)).rejects.toThrow(NotFoundException);
     });
+
   });
 
   describe('deleteEmployee', () => {
     it('should delete a employee successfully', async () => {
       const employeeId = 1;
+      const user = { id: 1 };
       jest.spyOn(controller, 'deleteEmployee').mockResolvedValue({
         id: employeeId,
       });
 
-      const result = await controller.deleteEmployee(employeeId);
+      const result = await controller.deleteEmployee(employeeId, user);
       expect(result).toEqual(expect.objectContaining({
         id: employeeId
       }));
     });
 
     it('should throw a NotFoundException for non-existing employee', async () => {
+      const user = { id: 1 };
       jest.spyOn(controller, 'deleteEmployee').mockRejectedValue(new NotFoundException());
-      await expect(controller.deleteEmployee(999)).rejects.toThrow(NotFoundException);
+      await expect(controller.deleteEmployee(999, user)).rejects.toThrow(NotFoundException);
     });
   });
 
   describe('getAllEmployees', () => {
     it('should fetch all employee successfully', async () => {
+      const userId = 1;
       jest.spyOn(controller, 'getAllEmployees').mockResolvedValue([
         {
+        userId,
         id: 1,
         email: 'jane.doe@example.com',
         name: 'Jane Doe',
@@ -113,6 +129,7 @@ describe('EmployeesController', () => {
         payRate: 25,
         },
         {
+        userId,
         id: 2,
         email: 'jane.doe@example.com',
         name: 'Jane Doee',
@@ -121,7 +138,7 @@ describe('EmployeesController', () => {
         },
       ]);
 
-      const result = await controller.getAllEmployees();
+      const result = await controller.getAllEmployees(userId);
       expect(result).toHaveLength(2);
     });
   });
@@ -130,7 +147,9 @@ describe('EmployeesController', () => {
   describe('getEmployee', () => {
     it('should fetch a employee successfully', async () => {
       const employeeId = 1;
+      const userId = 1;
       jest.spyOn(controller, 'getEmployee').mockResolvedValue({
+        userId,
         id: employeeId,
         email: 'jane.doe@example.com',
         name: 'Jane Doee',
@@ -138,15 +157,16 @@ describe('EmployeesController', () => {
         payRate: 25,
       });
 
-      const result = await controller.getEmployee(employeeId);
+      const result = await controller.getEmployee(employeeId, userId);
       expect(result).toEqual(expect.objectContaining({
         id: employeeId
       }));
     });
 
     it('should throw a NotFoundException for non-existing employee', async () => {
+      const user = { id: 1 };
       jest.spyOn(controller, 'getEmployee').mockRejectedValue(new NotFoundException());
-      await expect(controller.getEmployee(999)).rejects.toThrow(NotFoundException);
+      await expect(controller.getEmployee(999, user)).rejects.toThrow(NotFoundException);
     });
   });
 });

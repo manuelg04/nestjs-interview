@@ -22,9 +22,9 @@ describe('TimesheetController', () => {
 
   describe('createTimesheet', () => {
     it('should create a timesheet successfully', async () => {
+      const userId = 1;
       const CreateTimesheetDto = {
         employeeId: 1,
-        date: new Date(),
         hoursWorked: 8,
         grossWage: 160,
         checkDate: new Date(),
@@ -33,9 +33,10 @@ describe('TimesheetController', () => {
       jest.spyOn(controller, 'createTimesheet').mockResolvedValue({
         id: 2,
         ...CreateTimesheetDto,
+        userId,
       });
 
-      const result = await controller.createTimesheet(CreateTimesheetDto);
+      const result = await controller.createTimesheet(CreateTimesheetDto, userId);
       expect(result).toEqual(expect.objectContaining({
         ...CreateTimesheetDto,
         id: expect.any(Number) // Verifica que se haya generado un ID
@@ -43,13 +44,13 @@ describe('TimesheetController', () => {
     });
 
     it('should throw a ConflictException for duplicate timesheet', async () => {
+      const user = { id: 1 };
       jest.spyOn(controller, 'createTimesheet').mockRejectedValue(new ConflictException());
       await expect(controller.createTimesheet({
         employeeId: 1,
-        date: new Date(),
         hoursWorked: 8,
         checkDate: new Date(),
-      })).rejects.toThrow(ConflictException);
+      }, user)).rejects.toThrow(ConflictException);
     });
   });
 
@@ -57,7 +58,9 @@ describe('TimesheetController', () => {
   describe('updateTimesheet', () => {
     it('should update a timesheet successfully', async () => {
       const timesheetId = 1;
+      const userId = 1;
       const UpdateTimesheetDto = {
+        userId,
         employeeId: 1,
         date: new Date(),
         hoursWorked: 8,
@@ -109,20 +112,21 @@ describe('TimesheetController', () => {
 
   describe('findAllTimesheets', () => {
     it('should fetch all timesheets successfully', async () => {
+      const userId = 1;
       jest.spyOn(controller, 'findAllTimesheets').mockResolvedValue([
         {
+          userId,
           id: 1,
           employeeId: 1,
-          date: new Date(),
           hoursWorked: 8,
           grossWage: 160,
           checkDate: new Date(),
           status: 'pending', // default status
         },
         {
+          userId,
           id: 2,
           employeeId: 1,
-          date: new Date(),
           hoursWorked: 8,
           grossWage: 160,
           checkDate: new Date(),
@@ -130,7 +134,7 @@ describe('TimesheetController', () => {
         },
       ]);
 
-      const result = await controller.findAllTimesheets();
+      const result = await controller.findAllTimesheets(userId);
       expect(result).toHaveLength(2);
     });
   });
@@ -139,25 +143,27 @@ describe('TimesheetController', () => {
   describe('findOneTimesheet', () => {
     it('should fetch a timesheet successfully', async () => {
       const timesheetId = 1;
+      const userId = 1;
       jest.spyOn(controller, 'findOneTimesheet').mockResolvedValue({
+        userId,
         id: timesheetId,
         employeeId: 1,
-        date: new Date(),
         hoursWorked: 8,
         grossWage: 160,
         checkDate: new Date(),
         status: 'pending', // default status
       });
 
-      const result = await controller.findOneTimesheet(timesheetId);
+      const result = await controller.findOneTimesheet(timesheetId, userId);
       expect(result).toEqual(expect.objectContaining({
         id: timesheetId
       }));
     });
 
     it('should throw a NotFoundException for non-existing timesheet', async () => {
+      const user = { id: 1 };
       jest.spyOn(controller, 'findOneTimesheet').mockRejectedValue(new NotFoundException());
-      await expect(controller.findOneTimesheet(999)).rejects.toThrow(NotFoundException);
+      await expect(controller.findOneTimesheet(999, user)).rejects.toThrow(NotFoundException);
     });
   });
 });

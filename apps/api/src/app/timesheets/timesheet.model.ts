@@ -8,7 +8,7 @@ export class Timesheet {
   status: string;
   notes?: string;
   userId: number;
-  user: User;
+  user?: User;
 
   constructor(id: number, employeeId: number, grossWage: number, checkDate: Date, status: string, userId: number, user: User, hoursWorked?: number, notes?: string) {
     this.id = id;

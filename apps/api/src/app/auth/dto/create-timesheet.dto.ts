@@ -5,7 +5,7 @@ export class CreateTimesheetDto {
   @IsNumber()
   readonly employeeId: number;
 
-  readonly date: Date;
+  readonly date?: Date;
 
   @IsNumber()
   readonly hoursWorked?: number;

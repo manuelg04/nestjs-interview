@@ -47,14 +47,14 @@ export default function TimesheetManagement() {
       );
 
       if (response.status === 201) {
+        const employeePayRate = employees.find(e => e.id === timesheetData.employeeId)?.payRate ?? 0;
         const newTimesheetWithEmployeeInfo = {
-          ...timesheetData,
           ...response.data,
-          employeeName: employees.find((e) => e.id === timesheetData.employeeId)
-            ?.name,
+          employeePayRate,
+          employeeName: employees.find(e => e.id === timesheetData.employeeId)?.name ?? 'NULL',
         };
 
-        setTimesheets([...timesheets, newTimesheetWithEmployeeInfo]);
+        setTimesheets(prevTimesheets => [...prevTimesheets, newTimesheetWithEmployeeInfo]);
         closeTimesheetDialog();
       }
     } catch (error) {

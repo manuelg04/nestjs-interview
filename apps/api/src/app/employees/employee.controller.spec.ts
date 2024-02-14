@@ -45,15 +45,13 @@ describe('EmployeesController', () => {
 
     it('should throw a ConflictException for duplicate employee', async () => {
       jest.spyOn(controller, 'createEmployee').mockRejectedValue(new ConflictException());
-      const user = { id: 1 }; // Mock user object
+      const user = { id: 1 };
       const employeeDto = {
         email: 'test@example.com',
         name: 'John Doe',
         payType: 'hourly',
         payRate: 20,
       };
-
-      // Now call createEmployee with both the employeeDto and the mock user
       await expect(controller.createEmployee(employeeDto, user)).rejects.toThrow(ConflictException);
     });
 

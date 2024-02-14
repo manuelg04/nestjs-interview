@@ -7,7 +7,6 @@ import { PrismaModule } from 'nestjs-prisma';
 import { EmployeesModule } from './employees/employee.module';
 import { TimesheetModule } from './timesheets/timesheet.module';
 import { UserService } from './users/user.service';
-import { UserModule } from './users/user.module';
 import { PrismaService } from '../prisma.service';
 
 @Module({

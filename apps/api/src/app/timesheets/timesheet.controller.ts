@@ -38,7 +38,9 @@ export class TimesheetController {
   @Get()
   @UseGuards(JwtAuthGuard)
   findAllTimesheets(@GetUser() user) {
+    console.log(user.role);
     try {
+
       if (user.role === 'ADMIN') {
         return this.timesheetService.findAllTimesheets();
       } else {

@@ -58,16 +58,23 @@ export class TimesheetService {
 
   async findAllTimesheets(userId?: number): Promise<Timesheet[]> {
     try {
+      const whereCondition = userId ? { userId } : {};
+
       return this.prisma.timesheet.findMany({
-        where: { userId },
+        where: whereCondition,
         include: {
-          user: true,
+          user:{
+            select: {
+              email: true,
+            }
+          }
         },
       });
     } catch (error) {
       throw new InternalServerErrorException('Error fetching timesheets');
     }
   }
+
 
   async findOneTimesheet(id: number, userId: number): Promise<Timesheet> {
     try {

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import { Button } from '@ocmi/frontend/ui/components/button';
 import {
   Table,
@@ -64,6 +64,7 @@ export default function TimesheetManagement() {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
+    const role = localStorage.getItem('role');
     if (!token) {
       console.error('Authentication token is not available');
       return;
@@ -84,6 +85,7 @@ export default function TimesheetManagement() {
             headers: { Authorization: `Bearer ${token}` },
           },
         );
+        console.log("🚀 ~ timesheetsResponse:", timesheetsResponse.data)
         const timesheetsData = timesheetsResponse.data;
         const combinedTimesheets = timesheetsData.map((timesheet) => {
           const employee = employeesResponse.data.find(
@@ -91,7 +93,7 @@ export default function TimesheetManagement() {
           );
           return {
             ...timesheet,
-            employeeName: employee?.name ?? 'Unknown',
+            employeeName: role === 'ADMIN' ? timesheet.user?.email ?? 'Unknown' : employee?.name ?? 'Unknown',
             employeePayRate: employee?.payRate ?? 0,
           };
         });
@@ -124,7 +126,6 @@ export default function TimesheetManagement() {
       console.error('Error deleting timesheet:', error.response?.data || error.message);
     }
   };
-
 
   return (
     <div className="border rounded-lg">

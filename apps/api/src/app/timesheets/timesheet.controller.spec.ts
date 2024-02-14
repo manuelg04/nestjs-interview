@@ -39,7 +39,7 @@ describe('TimesheetController', () => {
       const result = await controller.createTimesheet(CreateTimesheetDto, userId);
       expect(result).toEqual(expect.objectContaining({
         ...CreateTimesheetDto,
-        id: expect.any(Number) // Verifica que se haya generado un ID
+        id: expect.any(Number)
       }));
     });
 

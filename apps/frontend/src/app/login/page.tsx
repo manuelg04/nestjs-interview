@@ -7,6 +7,8 @@ import { Button } from "../../ui/components/button";
 import Link from "next/link";
 import axios from 'axios';
 import Swal from 'sweetalert2';
+import { jwtDecode } from "jwt-decode";
+
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -28,8 +30,9 @@ export default function LoginPage() {
         email,
         password,
       });
-      console.log('🚀 ~ response:', response.data.result);
+      const decoded = jwtDecode(response.data.result.token);
       localStorage.setItem('token', response.data.result.token);
+      localStorage.setItem('role', decoded.role);
       router.push('/dashboard');
     } catch (error) {
       console.error('An error occurred', error);

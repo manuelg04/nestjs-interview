@@ -23,6 +23,7 @@ export default function Dashboard() {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [activeTab, setActiveTab] = useState('employees');
+  const [userRole, setUserRole] = useState('');
   const router = useRouter();
 
   const openEmployeeDialog = () => setEmployeeDialogOpen(true);
@@ -34,12 +35,14 @@ export default function Dashboard() {
 
   const handleLogout = () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('role');
     router.push('/login');
   };
 
-
   useEffect(() => {
     const token = localStorage.getItem('token');
+    const role = localStorage.getItem('role');
+    setUserRole(role);
     if (!token) {
       router.push('/login');
     }
@@ -55,7 +58,10 @@ export default function Dashboard() {
       });
       setEmployees(response.data);
     } catch (error) {
-      console.error('Error fetching employees:', error.response?.data || error.message);
+      console.error(
+        'Error fetching employees:',
+        error.response?.data || error.message,
+      );
     }
   };
 
@@ -68,35 +74,38 @@ export default function Dashboard() {
     openEmployeeDialog();
   };
 
-
   const handleSaveEmployee = async (employeeData: Employee) => {
     try {
-
       const token = localStorage.getItem('token');
       if (!token) {
         console.error('Authentication token is not available');
         return;
       }
 
-      const response = await axios.post('http://localhost:3000/api/employees', employeeData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
+      const response = await axios.post(
+        'http://localhost:3000/api/employees',
+        employeeData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
-      });
-      if(response.status === 201) {
+      );
+      if (response.status === 201) {
         Swal.fire({
-          title: "Its done!",
-          text: "Employee created successfully.",
-          icon: "success"
+          title: 'Its done!',
+          text: 'Employee created successfully.',
+          icon: 'success',
         });
 
         fetchEmployees();
       }
       closeEmployeeDialog();
-
     } catch (error) {
-
-      console.error('Error saving employee:', error.response?.data || error.message);
+      console.error(
+        'Error saving employee:',
+        error.response?.data || error.message,
+      );
     }
   };
 
@@ -108,17 +117,21 @@ export default function Dashboard() {
         return;
       }
 
-      const response = await axios.put(`http://localhost:3000/api/employees/${selectedEmployee?.id}`, employeeData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
+      const response = await axios.put(
+        `http://localhost:3000/api/employees/${selectedEmployee?.id}`,
+        employeeData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
-      });
+      );
 
-      if(response.status === 200) {
+      if (response.status === 200) {
         Swal.fire({
-          title: "Its done!",
-          text: "Employee updated successfully.",
-          icon: "success"
+          title: 'Its done!',
+          text: 'Employee updated successfully.',
+          icon: 'success',
         });
 
         fetchEmployees();
@@ -127,7 +140,10 @@ export default function Dashboard() {
       closeEmployeeDialog();
       setSelectedEmployee(null);
     } catch (error) {
-      console.error('Error updating employee:', error.response?.data || error.message);
+      console.error(
+        'Error updating employee:',
+        error.response?.data || error.message,
+      );
     }
   };
 
@@ -139,23 +155,28 @@ export default function Dashboard() {
         return;
       }
 
-      const response = await axios.delete(`http://localhost:3000/api/employees/${employeeId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
+      const response = await axios.delete(
+        `http://localhost:3000/api/employees/${employeeId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
-      });
+      );
 
-      if(response.status === 200) {
+      if (response.status === 200) {
         Swal.fire({
-          title: "Its done!",
-          text: "Employee deleted successfully.",
-          icon: "success"
+          title: 'Its done!',
+          text: 'Employee deleted successfully.',
+          icon: 'success',
         });
       }
-      setEmployees(employees.filter(employee => employee.id !== employeeId));
-
+      setEmployees(employees.filter((employee) => employee.id !== employeeId));
     } catch (error) {
-      console.error('Error deleting employee:', error.response?.data || error.message);
+      console.error(
+        'Error deleting employee:',
+        error.response?.data || error.message,
+      );
     }
   };
 
@@ -163,20 +184,40 @@ export default function Dashboard() {
     <div className="flex flex-col h-screen min-h-screen">
       <header className="flex h-14 items-center border-b px-4 md:px-6">
         <Button className="mr-6" onClick={handleLogout} variant={'outline'}>
-          <LogoutIcon className="h-6 w-6"/>
+          <LogoutIcon className="h-6 w-6" />
           <span className="sr-only">Logout</span>
         </Button>
         <nav className="hidden lg:flex flex-1 items-center gap-4 text-sm font-medium">
-          <button onClick={() => handleTabChange('employees')} className={`font-semibold ${activeTab === 'employees' ? 'text-blue-500' : 'text-gray-500'}`}>
-            Employee Management
-          </button>
-          <button onClick={() => handleTabChange('timesheets')} className={`ml-4 font-semibold ${activeTab === 'timesheets' ? 'text-blue-500' : 'text-gray-500'}`}>
+          {userRole !== 'ADMIN' && (
+            <button
+              onClick={() => handleTabChange('employees')}
+              className={`font-semibold ${activeTab === 'employees' ? 'text-blue-500' : 'text-gray-500'}`}
+            >
+              Employee Management
+            </button>
+          )}
+          <button
+            onClick={() => handleTabChange('timesheets')}
+            className={`ml-4 font-semibold ${activeTab === 'timesheets' ? 'text-blue-500' : 'text-gray-500'}`}
+          >
             Timesheet Management
           </button>
         </nav>
+
         <div className="ml-auto flex items-center gap-4 lg:gap-8">
-          <Button className="rounded-full border w-8 h-8" size="icon" variant="ghost">
-            <Image alt="Avatar" className="rounded-full" height="32" src="/placeholder.svg" style={{ aspectRatio: '32/32', objectFit: 'cover', }} width="32" />
+          <Button
+            className="rounded-full border w-8 h-8"
+            size="icon"
+            variant="ghost"
+          >
+            <Image
+              alt="Avatar"
+              className="rounded-full"
+              height="32"
+              src="/placeholder.svg"
+              style={{ aspectRatio: '32/32', objectFit: 'cover' }}
+              width="32"
+            />
             <span className="sr-only">View profile</span>
           </Button>
         </div>
@@ -202,16 +243,31 @@ export default function Dashboard() {
               </TableHeader>
               <TableBody>
                 {employees.map((employee) => (
-                  <TableRow key={employee.id} className="hover:bg-gray-100/50 dark:hover:bg-gray-800/50">
-                    <TableCell className="font-semibold">{employee.name}</TableCell>
+                  <TableRow
+                    key={employee.id}
+                    className="hover:bg-gray-100/50 dark:hover:bg-gray-800/50"
+                  >
+                    <TableCell className="font-semibold">
+                      {employee.name}
+                    </TableCell>
                     <TableCell>{employee.payType}</TableCell>
                     <TableCell>${employee.payRate.toFixed(2)}</TableCell>
                     <TableCell className="flex gap-2 min-w-[100px]">
-                      <Button className="rounded-full w-8 h-8" size="icon" variant="ghost" onClick={() => handleEditClick(employee)}>
+                      <Button
+                        className="rounded-full w-8 h-8"
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => handleEditClick(employee)}
+                      >
                         <FileEditIcon className="h-6 w-6" />
                         <span className="sr-only">Edit</span>
                       </Button>
-                      <Button className="rounded-full w-8 h-8" size="icon" variant="ghost" onClick={() => handleDeleteEmployee(employee.id)}>
+                      <Button
+                        className="rounded-full w-8 h-8"
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => handleDeleteEmployee(employee.id)}
+                      >
                         <TrashIcon className="h-6 w-6" />
                         <span className="sr-only">Delete</span>
                       </Button>
@@ -222,9 +278,7 @@ export default function Dashboard() {
             </Table>
           </div>
         )}
-        {activeTab === 'timesheets' && (
-          <TimesheetManagement />
-        )}
+        {activeTab === 'timesheets' && <TimesheetManagement />}
       </main>
       {isEmployeeDialogOpen && (
         <EmployeeDialog
@@ -236,7 +290,6 @@ export default function Dashboard() {
       )}
     </div>
   );
-
 }
 
 function FileEditIcon(props) {

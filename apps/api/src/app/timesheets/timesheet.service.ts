@@ -56,7 +56,7 @@ export class TimesheetService {
     }
   }
 
-  async findAllTimesheets(userId: number): Promise<Timesheet[]> {
+  async findAllTimesheets(userId?: number): Promise<Timesheet[]> {
     try {
       return this.prisma.timesheet.findMany({
         where: { userId },

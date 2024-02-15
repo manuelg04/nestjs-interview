@@ -1,5 +1,5 @@
 import {
-  Controller, Get, Post, Put, Delete, Body, Param, HttpException, HttpStatus, UseGuards
+  Controller, Get, Post, Put, Delete, Body, Param, HttpException, HttpStatus, UseGuards, ParseIntPipe
 } from '@nestjs/common';
 import { EmployeesService } from '../employees/employee.service';
 import { JwtAuthGuard } from '../auth/auth.guard';
@@ -57,10 +57,12 @@ export class EmployeesController {
 
   @Put(':id')
   @UseGuards(JwtAuthGuard)
-  async updateEmployee(@Param('id') id: number, @Body() updateDto: EmployeeUpdateDto, @GetUser() user): Promise<Employees> {
+  async updateEmployee(@Param('id', ParseIntPipe) id: number, @Body() updateDto: EmployeeUpdateDto, @GetUser() user): Promise<Employees> {
     try {
       const userId = user.id;
-      return await this.employeesService.updateEmployee(id, userId, updateDto);
+      const empleadoudpate = await this.employeesService.updateEmployee(id, userId, updateDto);
+      console.log("🚀 ~ empleadoudpate:", empleadoudpate)
+      return empleadoudpate;
     } catch (error) {
       if (error.status) {
         throw error;

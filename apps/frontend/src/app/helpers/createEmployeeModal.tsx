@@ -20,6 +20,7 @@ export function EmployeeDialog({ isOpen, onSave, onClose, employee }) {
   const handleSave = (event) => {
     event.preventDefault();
     const employeeData = {
+      ...employee,
       name,
       email,
       payType,

@@ -109,7 +109,10 @@ export default function Dashboard() {
     }
   };
 
-  const handleEditEmployee = async (employeeData: Employee) => {
+  const handleEditEmployee = async (employee: Employee) => {
+    console.log("🚀 ~ employee:", employee)
+    console.log("empleardo selecionado",selectedEmployee)
+    console.log(typeof selectedEmployee?.id)
     try {
       const token = localStorage.getItem('token');
       if (!token) {
@@ -119,13 +122,14 @@ export default function Dashboard() {
 
       const response = await axios.put(
         `http://localhost:3000/api/employees/${selectedEmployee?.id}`,
-        employeeData,
+        employee,
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         },
       );
+      console.log("🚀 ~ response:", response)
 
       if (response.status === 200) {
         Swal.fire({

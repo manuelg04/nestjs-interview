@@ -6,6 +6,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
   UseGuards,
@@ -74,16 +75,21 @@ export class TimesheetController {
   }
 
   @Patch(':id')
-  updateTimesheet(
-    @Param('id') id: number,
+  @UseGuards(JwtAuthGuard)
+  async updateTimesheet(
+    @Param('id', ParseIntPipe) id: number,
     @Body() updateTimesheetDto: UpdateTimesheetDto,
-  ) {
+    @GetUser() user,
+  ): Promise<Timesheet> {
+    const userId = user.id;
+    const role = user.role;
     try {
-      return this.timesheetService.updateTimesheet(+id, updateTimesheetDto);
+      return await this.timesheetService.updateTimesheet(id, userId, role, updateTimesheetDto);
     } catch (error) {
       throw new InternalServerErrorException('Error updating timesheet');
     }
   }
+
 
   @Delete(':id')
   deleteTimesheet(@Param('id') id: number) {

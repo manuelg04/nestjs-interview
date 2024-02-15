@@ -64,6 +64,7 @@ export class EmployeesService {
     userId: number,
     updateData: EmployeeUpdateDto,
   ): Promise<Employees> {
+    const employeeId = Number(id);
     if (
       updateData.payType === 'hourly' &&
       updateData.payRate < MINIMUM_WAGE.hourly
@@ -77,7 +78,7 @@ export class EmployeesService {
     }
     try {
       const employeeExists = await this.prisma.employee.findUnique({
-        where: { id, userId },
+        where: { id: employeeId, userId },
       });
 
       if (!employeeExists) {
@@ -85,15 +86,17 @@ export class EmployeesService {
       }
 
       const updatedEmployee = await this.prisma.employee.update({
-        where: { id },
+        where: { id: employeeId },
         data: updateData,
         include: {
           user: true,
         },
       });
+      console.log(updatedEmployee);
       return updatedEmployee;
     } catch (error) {
-      throw new InternalServerErrorException('Failed to update employee');
+      console.error(error.stack);
+
     }
   }
 

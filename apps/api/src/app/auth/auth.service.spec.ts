@@ -44,8 +44,8 @@ describe('AuthService', () => {
 
       const result = await authService.createUser(createUserDto);
 
-      expect(result).toEqual(expect.any(Object)); // Verifica que el resultado es un objeto
-      expect(result.token).toBeDefined(); // Verifica que el objeto resultado tiene una propiedad 'token'
+      expect(result).toEqual(expect.any(Object));
+      expect(result.token).toBeDefined();
     });
   });
 

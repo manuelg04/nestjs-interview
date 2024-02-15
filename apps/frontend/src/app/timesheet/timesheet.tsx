@@ -12,21 +12,30 @@ import axios from 'axios';
 import { TimesheetDialog } from '../helpers/createTimesheetModal';
 import { Employee } from '../entities/employee';
 import { Timesheet } from '../entities/timeesheet';
+import Swal from 'sweetalert2';
+import { NotesModal } from '../helpers/writeNotesModal';
 
 export default function TimesheetManagement() {
   const [isTimesheetDialogOpen, setIsTimesheetDialogOpen] = useState(false);
   const [selectedTimesheet, setSelectedTimesheet] = useState(null);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [timesheets, setTimesheets] = useState<Timesheet[]>([]);
+  const [isNotesModalOpen, setIsNotesModalOpen] = useState(false);
+  const [currentNotes, setCurrentNotes] = useState("");
 
   const openTimesheetDialog = () => setIsTimesheetDialogOpen(true);
   const totalGrossWages = timesheets.reduce((acc, timesheet) => acc + timesheet.grossWage, 0);
   const handleEditClick = (timesheet) => {
     console.log('🚀 ~ handleEditClick ~ timesheet', timesheet);
     setSelectedTimesheet(timesheet);
-    openTimesheetDialog();
+    setIsTimesheetDialogOpen(true);
   };
 
+  const openNotesDialog = (timesheet) => {
+    setCurrentNotes(timesheet.notes || "");
+    setSelectedTimesheet(timesheet.id);
+    setIsNotesModalOpen(true);
+  };
 
   const closeTimesheetDialog = () => {
     setIsTimesheetDialogOpen(false);
@@ -94,7 +103,7 @@ export default function TimesheetManagement() {
           return {
             ...timesheet,
             employeeName: role === 'ADMIN' ? timesheet.user?.email ?? 'Unknown' : employee?.name ?? 'Unknown',
-            employeePayRate: employee?.payRate ?? 0,
+            employeePayRate: role === 'ADMIN' ? timesheet.employee?.payRate ?? 0 : employee?.payRate ?? 0,
           };
         });
 
@@ -127,8 +136,79 @@ export default function TimesheetManagement() {
     }
   };
 
+  const handleUpdateTimesheet = async (timesheet: Timesheet) => {
+    try {
+      const token = localStorage.getItem('token');
+      const role = localStorage.getItem('role');
+
+      let timesheetData = {};
+      if (role === 'ADMIN') {
+        timesheetData = { status: timesheet.status, notes: timesheet.notes };
+      } else {
+        timesheetData = {
+          employeeId: timesheet.employeeId,
+          hoursWorked: timesheet.hoursWorked,
+          checkDate: new Date(timesheet.checkDate).toISOString(),
+          status: timesheet.status,
+        };
+      }
+
+      const response = await axios.patch(
+        `http://localhost:3000/api/timesheets/${timesheet.id}`,
+        timesheetData,
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+      console.log("🚀 ~ response:", response.data)
+
+      if (response.status === 200) {
+        setTimesheets((prevTimesheets) =>
+          prevTimesheets.map((t) =>
+            t.id === timesheet.id ? { ...t, ...timesheetData } : t
+          )
+        );
+        closeTimesheetDialog();
+      }
+    } catch (error) {
+      console.error('Error al actualizar el timesheet:', error);
+    }
+  };
+
+  const role = localStorage.getItem('role');
+
+  const saveNotes = async (notes) => {
+    console.log("🚀 ~ notes:", notes)
+    console.log("🚀 ~ selectedTimesheet:", selectedTimesheet)
+
+    const token = localStorage.getItem('token');
+    try {
+      const response = await axios.patch(
+        `http://localhost:3000/api/timesheets/${selectedTimesheet}`,
+        { notes },
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+      if (response.status === 200) {
+        Swal.fire({
+          icon: 'success',
+          title: 'Notes saved',
+          showConfirmButton: false,
+          timer: 1500,
+        });
+      }
+      setIsNotesModalOpen(false);
+    } catch (error) {
+      console.error('Error saving notes:', error);
+      alert("Failed to update notes"); 
+    }
+  };
+
   return (
     <div className="border rounded-lg">
+        <NotesModal
+        isOpen={isNotesModalOpen}
+        onSave={saveNotes}
+        onClose={() => setIsNotesModalOpen(false)}
+        initialNotes={currentNotes}
+      />
       <div className="flex justify-end p-4">
         <Button onClick={openTimesheetDialog} disabled={employees.length === 0}>
           Add Timesheet
@@ -142,6 +222,7 @@ export default function TimesheetManagement() {
             <TableHead>Pay Rate</TableHead>
             <TableHead>Gross Wage</TableHead>
             <TableHead>Check Date</TableHead>
+            <TableHead>Status</TableHead>
             <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -168,6 +249,12 @@ export default function TimesheetManagement() {
                         <TrashIcon className="h-6 w-6" />
                         <span className="sr-only">Delete</span>
                       </Button>
+                      {role === 'ADMIN' && (
+    <Button className="rounded-full w-8 h-8" size="icon" variant="ghost" onClick={() => openNotesDialog(timesheet)}>
+      <PencilIcon className="h-6 w-6" />
+      <span className="sr-only">Write Notes</span>
+    </Button>
+  )}
                     </TableCell>
             </TableRow>
           ))}
@@ -186,7 +273,7 @@ export default function TimesheetManagement() {
       {isTimesheetDialogOpen && (
         <TimesheetDialog
           isOpen={isTimesheetDialogOpen}
-          onSave={handleSaveTimesheet}
+          onSave={selectedTimesheet ? handleUpdateTimesheet : handleSaveTimesheet}
           onClose={closeTimesheetDialog}
           timesheet={selectedTimesheet}
           employees={employees}
@@ -196,6 +283,27 @@ export default function TimesheetManagement() {
     </div>
   );
 }
+
+function PencilIcon(props) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M12 19h9" />
+      <path d="M4 6h16" />
+      <path d="M12 19V8" />
+    </svg>
+  );
+  }
 
 
 function FileEditIcon(props) {

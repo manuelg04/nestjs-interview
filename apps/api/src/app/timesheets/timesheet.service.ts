@@ -1,4 +1,5 @@
 import {
+  ForbiddenException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -67,6 +68,11 @@ export class TimesheetService {
             select: {
               email: true,
             }
+          },
+          employee: {
+            select: {
+              payRate: true,
+            }
           }
         },
       });
@@ -102,20 +108,40 @@ export class TimesheetService {
 
   async updateTimesheet(
     id: number,
+    userId: number,
+    role: string,
     updateTimesheetDto: UpdateTimesheetDto,
   ): Promise<Timesheet> {
     try {
-      return this.prisma.timesheet.update({
+      const timesheet = await this.prisma.timesheet.findUnique({
         where: { id },
         include: {
           user: true,
         },
-        data: updateTimesheetDto,
+      });
+
+      if (!timesheet) {
+        throw new NotFoundException(`Timesheet with ID ${id} not found`);
+      }
+
+      if (role === 'CUSTOMER' && timesheet.userId !== userId) {
+        throw new ForbiddenException('You can only update your own timesheets');
+      }
+      const dataToUpdate = role === 'ADMIN' ? {
+        status: updateTimesheetDto.status,
+        notes: updateTimesheetDto.notes,
+      } : updateTimesheetDto;
+
+      return await this.prisma.timesheet.update({
+        where: { id },
+        data: dataToUpdate,
       });
     } catch (error) {
+      console.log(error.stack);
       throw new InternalServerErrorException('Error updating timesheet');
     }
   }
+
 
   async deleteTimesheet(id: number): Promise<{ id: number; }> {
     try {

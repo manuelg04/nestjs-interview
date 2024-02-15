@@ -1,5 +1,6 @@
 /* eslint-disable react/no-unescaped-entities */
 'use client';
+import { useEffect, useState } from "react";
 import { Button } from "../../ui/components/button";
 import { Input } from "../../ui/components/input";
 import { Select,
@@ -9,7 +10,6 @@ import { Select,
   SelectTrigger,
   SelectValue,
 } from "../../ui/components/select";
-import { useState } from 'react';
 
 export function EmployeeDialog({ isOpen, onSave, onClose, employee }) {
   const [name, setName] = useState(employee ? employee.name : '');
@@ -32,7 +32,7 @@ export function EmployeeDialog({ isOpen, onSave, onClose, employee }) {
   return (
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center p-4">
     <div className="bg-white p-8 rounded-lg shadow-xl max-w-md w-full">
-      <h2 className="text-xl font-semibold mb-4">Add Employee</h2>
+      <h2 className="text-xl font-semibold mb-4">{employee ? 'Edit Timesheet' : 'Add Timesheet'}</h2>
         <form onSubmit={handleSave} className="space-y-4">
           <div>
             <label htmlFor="name">Name</label>

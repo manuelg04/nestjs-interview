@@ -277,15 +277,17 @@ export default function TimesheetManagement() {
                   <FileEditIcon className="h-6 w-6" />
                   <span className="sr-only">Edit</span>
                 </Button>
-                <Button
-                  className="rounded-full w-8 h-8"
-                  size="icon"
-                  variant="ghost"
-                  onClick={() => handleDeleteTimesheet(timesheet.id)}
-                >
-                  <TrashIcon className="h-6 w-6" />
-                  <span className="sr-only">Delete</span>
-                </Button>
+                {role === 'CUSTOMER' && (
+        <Button
+          className="rounded-full w-8 h-8"
+          size="icon"
+          variant="ghost"
+          onClick={() => handleDeleteTimesheet(timesheet.id)}
+        >
+          <TrashIcon className="h-6 w-6" />
+          <span className="sr-only">Delete</span>
+        </Button>
+      )}
                 {role === 'ADMIN' && (
                   <Button
                     className="rounded-full w-8 h-8"
@@ -341,12 +343,11 @@ function PencilIcon(props) {
       strokeLinecap="round"
       strokeLinejoin="round"
     >
-      <path d="M12 19h9" />
-      <path d="M4 6h16" />
-      <path d="M12 19V8" />
+      <path d="M15.232 2.828a2.828 2.828 0 114 4L7.758 18.302l-4 1 1-4L15.232 2.828z" />
     </svg>
   );
 }
+
 
 function FileEditIcon(props) {
   return (

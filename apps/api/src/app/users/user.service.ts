@@ -13,6 +13,7 @@ export class UserService {
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
     return this.prisma.user.create({
       data: {
+        name: createUserDto.name,
         email: createUserDto.email,
         password: hashedPassword,
         role: createUserDto.role,
@@ -30,5 +31,16 @@ export class UserService {
     if (!passwordValid) throw new Error('Invalid password');
 
     return { message: 'Login successful', userId: user.id };
+  }
+
+  async getAllCustomers() {
+    return this.prisma.user.findMany({
+      where: { role: 'CUSTOMER' },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+      },
+    });
   }
 }

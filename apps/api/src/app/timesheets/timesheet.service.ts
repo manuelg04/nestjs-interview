@@ -66,6 +66,7 @@ export class TimesheetService {
         include: {
           user:{
             select: {
+              name: true,
               email: true,
             }
           },

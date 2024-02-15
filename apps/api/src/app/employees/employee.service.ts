@@ -92,7 +92,6 @@ export class EmployeesService {
           user: true,
         },
       });
-      console.log(updatedEmployee);
       return updatedEmployee;
     } catch (error) {
       console.error(error.stack);

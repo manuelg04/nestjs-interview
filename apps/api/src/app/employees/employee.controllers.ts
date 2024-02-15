@@ -61,7 +61,6 @@ export class EmployeesController {
     try {
       const userId = user.id;
       const empleadoudpate = await this.employeesService.updateEmployee(id, userId, updateDto);
-      console.log("🚀 ~ empleadoudpate:", empleadoudpate)
       return empleadoudpate;
     } catch (error) {
       if (error.status) {

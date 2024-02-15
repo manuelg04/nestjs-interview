@@ -19,6 +19,7 @@ export default function RegisterPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [userName, setUserName] = useState('');
   const [role, setRole] = useState('CUSTOMER');
   const [successMessage, setSuccessMessage] = useState('');
   const router = useRouter();
@@ -31,12 +32,12 @@ export default function RegisterPage() {
       const response = await axios.post(
         'http://localhost:3000/api/auth/register',
         {
+          name: userName,
           email,
           password,
           role,
         },
       );
-      console.log('🚀 ~ response:', response.data);
       setSuccessMessage('Registro exitoso. Redirigiendo al login...');
       setTimeout(() => {
         router.push('/login');
@@ -68,6 +69,13 @@ export default function RegisterPage() {
               {errorMessage}
             </div>
           )}
+
+          <Input
+            type="text"
+            placeholder="Name"
+            value={userName}
+            onChange={(e) => setUserName(e.target.value)}
+          />
 
           <Input
             type="email"

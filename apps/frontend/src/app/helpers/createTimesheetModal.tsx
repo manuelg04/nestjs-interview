@@ -29,7 +29,6 @@ export function TimesheetDialog({ isOpen, onSave, onClose, employees, timesheet 
 
   };
   const role = localStorage.getItem('role');
-  console.log("🚀 ~ role:", role)
 
   return (
     <div className={`fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center p-4 ${!isOpen && 'hidden'}`}>

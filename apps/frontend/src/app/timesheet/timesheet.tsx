@@ -26,7 +26,6 @@ export default function TimesheetManagement() {
   const openTimesheetDialog = () => setIsTimesheetDialogOpen(true);
   const totalGrossWages = timesheets.reduce((acc, timesheet) => acc + timesheet.grossWage, 0);
   const handleEditClick = (timesheet) => {
-    console.log('🚀 ~ handleEditClick ~ timesheet', timesheet);
     setSelectedTimesheet(timesheet);
     setIsTimesheetDialogOpen(true);
   };
@@ -94,7 +93,6 @@ export default function TimesheetManagement() {
             headers: { Authorization: `Bearer ${token}` },
           },
         );
-        console.log("🚀 ~ timesheetsResponse:", timesheetsResponse.data)
         const timesheetsData = timesheetsResponse.data;
         const combinedTimesheets = timesheetsData.map((timesheet) => {
           const employee = employeesResponse.data.find(
@@ -158,8 +156,6 @@ export default function TimesheetManagement() {
         timesheetData,
         { headers: { Authorization: `Bearer ${token}` } },
       );
-      console.log("🚀 ~ response:", response.data)
-
       if (response.status === 200) {
         setTimesheets((prevTimesheets) =>
           prevTimesheets.map((t) =>
@@ -176,8 +172,6 @@ export default function TimesheetManagement() {
   const role = localStorage.getItem('role');
 
   const saveNotes = async (notes) => {
-    console.log("🚀 ~ notes:", notes)
-    console.log("🚀 ~ selectedTimesheet:", selectedTimesheet)
 
     const token = localStorage.getItem('token');
     try {
@@ -197,7 +191,7 @@ export default function TimesheetManagement() {
       setIsNotesModalOpen(false);
     } catch (error) {
       console.error('Error saving notes:', error);
-      alert("Failed to update notes"); 
+      alert("Failed to update notes");
     }
   };
 

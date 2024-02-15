@@ -1,5 +1,4 @@
 'use client';
-import Link from 'next/link';
 import { Button } from '../../ui/components/button';
 import {
   TableHead,
@@ -17,6 +16,7 @@ import { Employee } from '../entities/employee';
 import { useRouter } from 'next/navigation';
 import Swal from 'sweetalert2';
 import TimesheetManagement from '../timesheet/timesheet';
+import CustomersTable from '../customers/page';
 
 export default function Dashboard() {
   const [isEmployeeDialogOpen, setEmployeeDialogOpen] = useState(false);
@@ -110,9 +110,6 @@ export default function Dashboard() {
   };
 
   const handleEditEmployee = async (employee: Employee) => {
-    console.log("🚀 ~ employee:", employee)
-    console.log("empleardo selecionado",selectedEmployee)
-    console.log(typeof selectedEmployee?.id)
     try {
       const token = localStorage.getItem('token');
       if (!token) {
@@ -129,7 +126,6 @@ export default function Dashboard() {
           },
         },
       );
-      console.log("🚀 ~ response:", response)
 
       if (response.status === 200) {
         Swal.fire({
@@ -192,20 +188,38 @@ export default function Dashboard() {
           <span className="sr-only">Logout</span>
         </Button>
         <nav className="hidden lg:flex flex-1 items-center gap-4 text-sm font-medium">
-          {userRole !== 'ADMIN' && (
-            <button
-              onClick={() => handleTabChange('employees')}
-              className={`font-semibold ${activeTab === 'employees' ? 'text-blue-500' : 'text-gray-500'}`}
-            >
-              Employee Management
-            </button>
+          {userRole === 'ADMIN' && (
+            <>
+              <button
+                onClick={() => handleTabChange('timesheets')}
+                className={`font-semibold ${activeTab === 'timesheets' ? 'text-blue-500' : 'text-gray-500'}`}
+              >
+                Timesheet Management
+              </button>
+              <button
+                onClick={() => handleTabChange('customerManagement')}
+                className={`ml-4 font-semibold ${activeTab === 'customerManagement' ? 'text-blue-500' : 'text-gray-500'}`}
+              >
+                Customer Management
+              </button>
+            </>
           )}
-          <button
-            onClick={() => handleTabChange('timesheets')}
-            className={`ml-4 font-semibold ${activeTab === 'timesheets' ? 'text-blue-500' : 'text-gray-500'}`}
-          >
-            Timesheet Management
-          </button>
+          {userRole === 'CUSTOMER' && (
+            <>
+              <button
+                onClick={() => handleTabChange('employees')}
+                className={`font-semibold ${activeTab === 'employees' ? 'text-blue-500' : 'text-gray-500'}`}
+              >
+                Employee Management
+              </button>
+              <button
+                onClick={() => handleTabChange('timesheets')}
+                className={`ml-4 font-semibold ${activeTab === 'timesheets' ? 'text-blue-500' : 'text-gray-500'}`}
+              >
+                Timesheet Management
+              </button>
+            </>
+          )}
         </nav>
 
         <div className="ml-auto flex items-center gap-4 lg:gap-8">
@@ -227,6 +241,11 @@ export default function Dashboard() {
         </div>
       </header>
       <main className="flex-1 flex flex-col gap-4 p-4 md:gap-8 md:p-6">
+      {activeTab === 'customerManagement' && userRole === 'ADMIN' && (
+          <div>
+          <CustomersTable />
+          </div>
+        )}
         <div className="flex items-center">
           {activeTab === 'employees' && (
             <Button className="ml-auto" size="sm" onClick={openEmployeeDialog}>
@@ -282,7 +301,9 @@ export default function Dashboard() {
             </Table>
           </div>
         )}
-        {activeTab === 'timesheets' && <TimesheetManagement />}
+        {((userRole === 'ADMIN' || userRole === 'CUSTOMER') && activeTab === 'timesheets') && (
+            <TimesheetManagement />
+        )}
       </main>
       {isEmployeeDialogOpen && (
         <EmployeeDialog

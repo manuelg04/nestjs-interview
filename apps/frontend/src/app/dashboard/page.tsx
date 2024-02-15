@@ -102,10 +102,11 @@ export default function Dashboard() {
       }
       closeEmployeeDialog();
     } catch (error) {
-      console.error(
-        'Error saving employee:',
-        error.response?.data || error.message,
-      );
+     Swal.fire({
+        title: 'Error!',
+        text: error.response?.data.message || error.message,
+        icon: 'error',
+      });
     }
   };
 

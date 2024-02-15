@@ -1,3 +1,4 @@
+/* eslint-disable no-prototype-builtins */
 import {
   ForbiddenException,
   Injectable,
@@ -46,7 +47,7 @@ export class TimesheetService {
           grossWage,
           checkDate: checkDateObj,
           status: 'pending', // default status
-          userId
+          userId,
         },
         include: {
           user: true,
@@ -64,24 +65,23 @@ export class TimesheetService {
       return this.prisma.timesheet.findMany({
         where: whereCondition,
         include: {
-          user:{
+          user: {
             select: {
               name: true,
               email: true,
-            }
+            },
           },
           employee: {
             select: {
               payRate: true,
-            }
-          }
+            },
+          },
         },
       });
     } catch (error) {
       throw new InternalServerErrorException('Error fetching timesheets');
     }
   }
-
 
   async findOneTimesheet(id: number, userId: number): Promise<Timesheet> {
     try {
@@ -96,16 +96,15 @@ export class TimesheetService {
       });
 
       if (!timesheet)
-        throw new NotFoundException(`Timesheet with ID ${id} not found for user ID ${userId}`);
+        throw new NotFoundException(
+          `Timesheet with ID ${id} not found for user ID ${userId}`,
+        );
 
       return timesheet;
     } catch (error) {
       throw new InternalServerErrorException('Error fetching timesheet');
     }
   }
-
-
-
 
   async updateTimesheet(
     id: number,
@@ -128,10 +127,27 @@ export class TimesheetService {
       if (role === 'CUSTOMER' && timesheet.userId !== userId) {
         throw new ForbiddenException('You can only update your own timesheets');
       }
-      const dataToUpdate = role === 'ADMIN' ? {
-        status: updateTimesheetDto.status,
-        notes: updateTimesheetDto.notes,
-      } : updateTimesheetDto;
+      let dataToUpdate = {};
+
+      if (role === 'CUSTOMER') {
+        if (updateTimesheetDto.hasOwnProperty('hoursWorked')) {
+          const grossWage = await this.calculateGrossWage(
+            timesheet.employeeId,
+            updateTimesheetDto.hoursWorked,
+          );
+          dataToUpdate = {
+            ...updateTimesheetDto,
+            grossWage,
+          };
+        } else {
+          dataToUpdate = updateTimesheetDto;
+        }
+      } else if (role === 'ADMIN') {
+        dataToUpdate = {
+          status: updateTimesheetDto.status,
+          notes: updateTimesheetDto.notes,
+        };
+      }
 
       return await this.prisma.timesheet.update({
         where: { id },
@@ -143,8 +159,7 @@ export class TimesheetService {
     }
   }
 
-
-  async deleteTimesheet(id: number): Promise<{ id: number; }> {
+  async deleteTimesheet(id: number): Promise<{ id: number }> {
     try {
       const timesheetExists = await this.prisma.timesheet.findUnique({
         where: { id },

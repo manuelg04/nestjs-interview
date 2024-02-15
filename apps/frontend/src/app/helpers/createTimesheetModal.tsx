@@ -53,11 +53,11 @@ export function TimesheetDialog({ isOpen, onSave, onClose, employees, timesheet 
           </div>
           <div>
             <label htmlFor="hoursWorked">Hours Worked</label>
-            <Input id="hoursWorked" type="number" value={hoursWorked} onChange={(e) => setHoursWorked(e.target.value)} />
+            <Input required  title="Hours worked is required" id="hoursWorked" type="number" value={hoursWorked} onChange={(e) => setHoursWorked(e.target.value)} />
           </div>
           <div>
             <label htmlFor="checkDate">Check Date</label>
-            <Input id="checkDate" type="date" value={checkDate} onChange={(e) => setCheckDate(e.target.value)} />
+            <Input required id="checkDate" type="date" value={checkDate} onChange={(e) => setCheckDate(e.target.value)} />
           </div>
           <div>
     <label htmlFor="status">Status</label>

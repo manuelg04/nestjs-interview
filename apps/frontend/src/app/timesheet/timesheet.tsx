@@ -21,17 +21,20 @@ export default function TimesheetManagement() {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [timesheets, setTimesheets] = useState<Timesheet[]>([]);
   const [isNotesModalOpen, setIsNotesModalOpen] = useState(false);
-  const [currentNotes, setCurrentNotes] = useState("");
+  const [currentNotes, setCurrentNotes] = useState('');
 
   const openTimesheetDialog = () => setIsTimesheetDialogOpen(true);
-  const totalGrossWages = timesheets.reduce((acc, timesheet) => acc + timesheet.grossWage, 0);
+  const totalGrossWages = timesheets.reduce(
+    (acc, timesheet) => acc + timesheet.grossWage,
+    0,
+  );
   const handleEditClick = (timesheet) => {
     setSelectedTimesheet(timesheet);
     setIsTimesheetDialogOpen(true);
   };
 
   const openNotesDialog = (timesheet) => {
-    setCurrentNotes(timesheet.notes || "");
+    setCurrentNotes(timesheet.notes || '');
     setSelectedTimesheet(timesheet.id);
     setIsNotesModalOpen(true);
   };
@@ -55,14 +58,21 @@ export default function TimesheetManagement() {
       );
 
       if (response.status === 201) {
-        const employeePayRate = employees.find(e => e.id === timesheetData.employeeId)?.payRate ?? 0;
+        const employeePayRate =
+          employees.find((e) => e.id === timesheetData.employeeId)?.payRate ??
+          0;
         const newTimesheetWithEmployeeInfo = {
           ...response.data,
           employeePayRate,
-          employeeName: employees.find(e => e.id === timesheetData.employeeId)?.name ?? 'NULL',
+          employeeName:
+            employees.find((e) => e.id === timesheetData.employeeId)?.name ??
+            'NULL',
         };
 
-        setTimesheets(prevTimesheets => [...prevTimesheets, newTimesheetWithEmployeeInfo]);
+        setTimesheets((prevTimesheets) => [
+          ...prevTimesheets,
+          newTimesheetWithEmployeeInfo,
+        ]);
         closeTimesheetDialog();
       }
     } catch (error) {
@@ -93,6 +103,7 @@ export default function TimesheetManagement() {
             headers: { Authorization: `Bearer ${token}` },
           },
         );
+        console.log("🚀 ~ timesheetsResponse:", timesheetsResponse.data)
         const timesheetsData = timesheetsResponse.data;
         const combinedTimesheets = timesheetsData.map((timesheet) => {
           const employee = employeesResponse.data.find(
@@ -100,8 +111,14 @@ export default function TimesheetManagement() {
           );
           return {
             ...timesheet,
-            employeeName: role === 'ADMIN' ? timesheet.user?.email ?? 'Unknown' : employee?.name ?? 'Unknown',
-            employeePayRate: role === 'ADMIN' ? timesheet.employee?.payRate ?? 0 : employee?.payRate ?? 0,
+            employeeName:
+              role === 'ADMIN'
+                ? timesheet.user?.email ?? 'Unknown'
+                : employee?.name ?? 'Unknown',
+            employeePayRate:
+              role === 'ADMIN'
+                ? timesheet.employee?.payRate ?? 0
+                : employee?.payRate ?? 0,
           };
         });
 
@@ -120,17 +137,23 @@ export default function TimesheetManagement() {
   const handleDeleteTimesheet = async (id) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.delete(`http://localhost:3000/api/timesheets/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
+      const response = await axios.delete(
+        `http://localhost:3000/api/timesheets/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
-      });
+      );
 
       if (response.status === 200) {
-        setTimesheets(timesheets.filter(timesheet => timesheet.id !== id));
+        setTimesheets(timesheets.filter((timesheet) => timesheet.id !== id));
       }
     } catch (error) {
-      console.error('Error deleting timesheet:', error.response?.data || error.message);
+      console.error(
+        'Error deleting timesheet:',
+        error.response?.data || error.message,
+      );
     }
   };
 
@@ -156,11 +179,13 @@ export default function TimesheetManagement() {
         timesheetData,
         { headers: { Authorization: `Bearer ${token}` } },
       );
+      console.log("🚀 ~ response:", response.data)
       if (response.status === 200) {
+        const updatedTimesheet = response.data;
         setTimesheets((prevTimesheets) =>
           prevTimesheets.map((t) =>
-            t.id === timesheet.id ? { ...t, ...timesheetData } : t
-          )
+            t.id === timesheet.id ? { ...t, ...updatedTimesheet } : t,
+          ),
         );
         closeTimesheetDialog();
       }
@@ -172,7 +197,6 @@ export default function TimesheetManagement() {
   const role = localStorage.getItem('role');
 
   const saveNotes = async (notes) => {
-
     const token = localStorage.getItem('token');
     try {
       const response = await axios.patch(
@@ -191,13 +215,13 @@ export default function TimesheetManagement() {
       setIsNotesModalOpen(false);
     } catch (error) {
       console.error('Error saving notes:', error);
-      alert("Failed to update notes");
+      alert('Failed to update notes');
     }
   };
 
   return (
     <div className="border rounded-lg">
-        <NotesModal
+      <NotesModal
         isOpen={isNotesModalOpen}
         onSave={saveNotes}
         onClose={() => setIsNotesModalOpen(false)}
@@ -231,49 +255,68 @@ export default function TimesheetManagement() {
               <TableCell>${timesheet.employeePayRate?.toFixed(2)}</TableCell>
               <TableCell>${timesheet.grossWage.toFixed(2)}</TableCell>
               <TableCell>
-                {new Date(timesheet.checkDate).toLocaleDateString()}
+                {new Date(timesheet.checkDate).toLocaleDateString('es-CO', {
+                  timeZone: 'UTC',
+                })}
               </TableCell>
+
               <TableCell>{timesheet.status}</TableCell>
               <TableCell className="flex gap-2 min-w-[100px]">
-                      <Button className="rounded-full w-8 h-8" size="icon" variant="ghost" onClick={() => handleEditClick(timesheet)}>
-                        <FileEditIcon className="h-6 w-6" />
-                        <span className="sr-only">Edit</span>
-                      </Button>
-                      <Button className="rounded-full w-8 h-8" size="icon" variant="ghost" onClick={() => handleDeleteTimesheet(timesheet.id)}>
-                        <TrashIcon className="h-6 w-6" />
-                        <span className="sr-only">Delete</span>
-                      </Button>
-                      {role === 'ADMIN' && (
-    <Button className="rounded-full w-8 h-8" size="icon" variant="ghost" onClick={() => openNotesDialog(timesheet)}>
-      <PencilIcon className="h-6 w-6" />
-      <span className="sr-only">Write Notes</span>
-    </Button>
-  )}
-                    </TableCell>
+                <Button
+                  className="rounded-full w-8 h-8"
+                  size="icon"
+                  variant="ghost"
+                  onClick={() => handleEditClick(timesheet)}
+                >
+                  <FileEditIcon className="h-6 w-6" />
+                  <span className="sr-only">Edit</span>
+                </Button>
+                <Button
+                  className="rounded-full w-8 h-8"
+                  size="icon"
+                  variant="ghost"
+                  onClick={() => handleDeleteTimesheet(timesheet.id)}
+                >
+                  <TrashIcon className="h-6 w-6" />
+                  <span className="sr-only">Delete</span>
+                </Button>
+                {role === 'ADMIN' && (
+                  <Button
+                    className="rounded-full w-8 h-8"
+                    size="icon"
+                    variant="ghost"
+                    onClick={() => openNotesDialog(timesheet)}
+                  >
+                    <PencilIcon className="h-6 w-6" />
+                    <span className="sr-only">Write Notes</span>
+                  </Button>
+                )}
+              </TableCell>
             </TableRow>
           ))}
-  <TableRow>
-          {/* Celda vacía para todas las columnas excepto "Gross Wage" y "Actions" */}
-          <TableCell colSpan={3}></TableCell>
-          {/* Celda para el total de salarios brutos */}
-          <TableCell className="text-left pl-1">
-            Total Gross Wages: ${totalGrossWages.toFixed(2)}
-          </TableCell>
-          {/* Celda vacía para la columna "Actions" */}
-          <TableCell></TableCell>
-        </TableRow>
+          <TableRow>
+            {/* Celda vacía para todas las columnas excepto "Gross Wage" y "Actions" */}
+            <TableCell colSpan={3}></TableCell>
+            {/* Celda para el total de salarios brutos */}
+            <TableCell className="text-left pl-1">
+              Total Gross Wages: ${totalGrossWages.toFixed(2)}
+            </TableCell>
+            {/* Celda vacía para la columna "Actions" */}
+            <TableCell></TableCell>
+          </TableRow>
         </TableBody>
       </Table>
       {isTimesheetDialogOpen && (
         <TimesheetDialog
           isOpen={isTimesheetDialogOpen}
-          onSave={selectedTimesheet ? handleUpdateTimesheet : handleSaveTimesheet}
+          onSave={
+            selectedTimesheet ? handleUpdateTimesheet : handleSaveTimesheet
+          }
           onClose={closeTimesheetDialog}
           timesheet={selectedTimesheet}
           employees={employees}
         />
       )}
-
     </div>
   );
 }
@@ -297,8 +340,7 @@ function PencilIcon(props) {
       <path d="M12 19V8" />
     </svg>
   );
-  }
-
+}
 
 function FileEditIcon(props) {
   return (

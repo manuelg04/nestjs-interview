@@ -36,14 +36,14 @@ export function TimesheetDialog({ isOpen, onSave, onClose, employees, timesheet 
         <h2 className="text-xl font-semibold mb-4">{timesheet ? 'Edit Timesheet' : 'Add Timesheet'}</h2>
         <form onSubmit={handleSave} className="space-y-4">
           <div>
-          <label htmlFor="employeeId">Employee</label>
-        <select
-          id="employeeId"
-          value={employeeId}
-          onChange={(e) => setEmployeeId(e.target.value)}
-          className="form-select block w-full mt-1"
-          disabled={role === 'ADMIN' || timesheet !== null} // Deshabilitar para ADMIN o cuando esté editando
-        >
+            <label htmlFor="employeeId">Employee</label>
+            <select
+              id="employeeId"
+              value={employeeId}
+              onChange={(e) => setEmployeeId(e.target.value)}
+              className="form-select block w-full mt-1"
+              disabled={role === 'ADMIN'} // Ajustado para deshabilitar para ADMIN
+            >
               {employees.map((employee) => (
                 <option key={employee.id} value={employee.id}>
                   {employee.name}
@@ -53,27 +53,41 @@ export function TimesheetDialog({ isOpen, onSave, onClose, employees, timesheet 
           </div>
           <div>
             <label htmlFor="hoursWorked">Hours Worked</label>
-            <Input required  title="Hours worked is required" id="hoursWorked" type="number" value={hoursWorked} onChange={(e) => setHoursWorked(e.target.value)} />
+            <Input
+              required
+              title="Hours worked is required"
+              id="hoursWorked"
+              type="number"
+              value={hoursWorked}
+              onChange={(e) => setHoursWorked(e.target.value)}
+              disabled={role === 'ADMIN'} // Deshabilitar para ADMIN
+            />
           </div>
           <div>
             <label htmlFor="checkDate">Check Date</label>
-            <Input required id="checkDate" type="date" value={checkDate} onChange={(e) => setCheckDate(e.target.value)} />
+            <Input
+              required
+              id="checkDate"
+              type="date"
+              value={checkDate}
+              onChange={(e) => setCheckDate(e.target.value)}
+              disabled={role === 'ADMIN'} // Deshabilitar para ADMIN
+            />
           </div>
           <div>
-    <label htmlFor="status">Status</label>
-    <select
-      id="status"
-      value={status}
-      onChange={(e) => setStatus(e.target.value)}
-      className="form-select block w-full mt-1"
-      disabled={role === 'CUSTOMER'}
-    >
-      {/* Agrega aquí más opciones de estado según tu lógica de negocio */}
-      <option value="pending">Pending</option>
-      <option value="approved">Approved</option>
-      <option value="rejected">Rejected</option>
-    </select>
-  </div>
+            <label htmlFor="status">Status</label>
+            <select
+              id="status"
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+              className="form-select block w-full mt-1"
+              disabled={role === 'CUSTOMER'}
+            >
+              <option value="pending">Pending</option>
+              <option value="approved">Approved</option>
+              <option value="rejected">Rejected</option>
+            </select>
+          </div>
           <div className="flex justify-end space-x-4">
             <Button variant="outline" onClick={onClose}>Cancel</Button>
             <Button type="submit">{timesheet ? 'Update' : 'Save'}</Button>

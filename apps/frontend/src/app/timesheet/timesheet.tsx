@@ -241,6 +241,7 @@ export default function TimesheetManagement() {
             <TableHead>Gross Wage</TableHead>
             <TableHead>Check Date</TableHead>
             <TableHead>Status</TableHead>
+            {role === 'ADMIN' && <TableHead>Notes</TableHead>}
             <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -261,6 +262,11 @@ export default function TimesheetManagement() {
               </TableCell>
 
               <TableCell>{timesheet.status}</TableCell>
+              {role === 'ADMIN' && (
+              <TableCell>
+                {timesheet.notes}
+              </TableCell>
+            )}
               <TableCell className="flex gap-2 min-w-[100px]">
                 <Button
                   className="rounded-full w-8 h-8"

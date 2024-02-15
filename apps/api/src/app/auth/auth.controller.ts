@@ -33,16 +33,16 @@ export class AuthController{
      async register(@Req() request: Request, @Res() response: Response, @Body() createUserDto: CreateUserDto): Promise<any> {
        try {
          const result = await this.authService.createUser(createUserDto);
-         return response.status(200).json({
-           status: 'Ok!',
-           message: 'Successfully registered user!',
-           result: result,
-         });
+       return response.status(HttpStatus.CREATED).json({
+          status: 'Ok!',
+          message: 'Successfully registered!',
+          result: result
+        });
        } catch (err) {
-         return response.status(500).json({
-           status: 'Error!',
-           message: 'Internal Server Error! ',
-         });
+          return response.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+            status: 'Error',
+            message: 'Failed to register user',
+          });
 
        }
      }

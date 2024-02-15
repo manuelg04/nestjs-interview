@@ -222,24 +222,6 @@ export default function Dashboard() {
             </>
           )}
         </nav>
-
-        <div className="ml-auto flex items-center gap-4 lg:gap-8">
-          <Button
-            className="rounded-full border w-8 h-8"
-            size="icon"
-            variant="ghost"
-          >
-            <Image
-              alt="Avatar"
-              className="rounded-full"
-              height="32"
-              src="/placeholder.svg"
-              style={{ aspectRatio: '32/32', objectFit: 'cover' }}
-              width="32"
-            />
-            <span className="sr-only">View profile</span>
-          </Button>
-        </div>
       </header>
       <main className="flex-1 flex flex-col gap-4 p-4 md:gap-8 md:p-6">
       {activeTab === 'customerManagement' && userRole === 'ADMIN' && (
@@ -344,8 +326,6 @@ function LogoutIcon(props) {
     <svg
       {...props}
       xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
@@ -353,11 +333,15 @@ function LogoutIcon(props) {
       strokeLinecap="round"
       strokeLinejoin="round"
     >
-      <path d="M9 5l7 7-7 7" />
-      <path d="M16 12H9" />
+      <path d="M5 21h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2H5" />
+      <polyline points="8 7 3 12 8 17" />
+      <line x1="3" y1="12" x2="15" y2="12" />
     </svg>
   );
 }
+
+
+
 
 function TrashIcon(props) {
   return (

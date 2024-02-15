@@ -14,6 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@ocmi/frontend/ui/components/select';
+import Swal from 'sweetalert2';
 
 export default function RegisterPage() {
   const [email, setEmail] = useState('');
@@ -29,7 +30,7 @@ export default function RegisterPage() {
     setErrorMessage('');
 
     try {
-      const response = await axios.post(
+      await axios.post(
         'http://localhost:3000/api/auth/register',
         {
           name: userName,
@@ -38,13 +39,21 @@ export default function RegisterPage() {
           role,
         },
       );
-      setSuccessMessage('Registro exitoso. Redirigiendo al login...');
+      Swal.fire({
+        icon: 'success',
+        title: 'Success',
+        text: 'Account created successfully',
+      });
       setTimeout(() => {
         router.push('/login');
       }, 1000);
     } catch (error) {
       if (error.response) {
-        setErrorMessage(error.response.data.message);
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: error.response.data.message,
+        });
       }
     }
   };
@@ -74,23 +83,26 @@ export default function RegisterPage() {
             type="text"
             placeholder="Name"
             value={userName}
+            required
             onChange={(e) => setUserName(e.target.value)}
           />
 
           <Input
             type="email"
+            required
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
           <Input
             type="password"
+            required
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
 
-          <Select value={role} onValueChange={setRole} className="w-full">
+          <Select required value={role} onValueChange={setRole} className="w-full">
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Select role" />
             </SelectTrigger>
